@@ -1,4 +1,4 @@
-## Operador municipal
+## Operador municipal que gestiona los lugares turísticos en el sistema de turismo.
 
 CREATE TABLE operador_municipal (
     id VARCHAR(36) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE operador_municipal (
   COLLATE=utf8mb4_unicode_ci;
 
 
-## Tabla lugar turistico
+## Tabla para almacenar los lugares turísticos registrados por los operadores municipales
 
 CREATE TABLE lugar (
     id VARCHAR(36) NOT NULL,
@@ -77,7 +77,6 @@ CREATE TABLE lugar (
 
 
 ## Auditoría de cambios en la tabla lugar
-
 CREATE TABLE auditoria_lugar (
     id BIGINT NOT NULL AUTO_INCREMENT,
 
