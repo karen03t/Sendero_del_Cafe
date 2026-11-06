@@ -1,0 +1,293 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-0000-4000-8000-pdswrf010001",
+    "name": "PDSW · RF-01 Registro de turista",
+    "description": "Colección de pruebas del contrato POST /api/v1/auth/registro (Sprint 1, SCRUM-16). Cubre CP-01 a CP-04, CA-02 y RNF-02. Ejecutar con el backend en http://127.0.0.1:8080 y MySQL arriba.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 · Catálogo de intereses (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Devuelve 3 intereses activos', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an('array').with.lengthOf(3);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/intereses",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "intereses"]
+        }
+      }
+    },
+    {
+      "name": "01 · CP-01 Registro válido (201)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('correoRegistrado', 'ana.' + Date.now() + '@ejemplo.com');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test('Devuelve id', () => pm.expect(body.id).to.be.a('string'));",
+              "pm.test('Devuelve token JWT de 3 segmentos', () => {",
+              "  pm.expect(body.tokenSesion.split('.')).to.have.lengthOf(3);",
+              "});",
+              "pm.test('Conserva los 2 intereses enviados', () => pm.expect(body.intereses).to.eql([1, 2]));",
+              "pm.collectionVariables.set('idTurista', body.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Ana Ríos\",\n  \"correo\": \"{{correoRegistrado}}\",\n  \"intereses\": [1, 2],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "02 · CP-02 Correo duplicado (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('409 Conflict', () => pm.response.to.have.status(409));",
+              "const body = pm.response.json();",
+              "pm.test('Código CORREO_DUPLICADO', () => pm.expect(body.codigo).to.eql('CORREO_DUPLICADO'));",
+              "pm.test('Mensaje exacto del contrato', () => pm.expect(body.mensaje).to.eql('Ya existe una cuenta con este correo'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Ana Ríos\",\n  \"correo\": \"{{correoRegistrado}}\",\n  \"intereses\": [1],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "03 · CP-03 Sin correo (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test('Código CORREO_OBLIGATORIO', () => pm.expect(body.codigo).to.eql('CORREO_OBLIGATORIO'));",
+              "pm.test('Mensaje exacto', () => pm.expect(body.mensaje).to.eql('El correo es obligatorio'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Luis Pérez\",\n  \"intereses\": [1],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "04 · CA-02 Sin intereses (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Código SIN_INTERESES', () => pm.expect(pm.response.json().codigo).to.eql('SIN_INTERESES'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Luis Pérez\",\n  \"correo\": \"luis.{{$timestamp}}@ejemplo.com\",\n  \"intereses\": [],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "05 · RNF-02 Sin consentimiento (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Código CONSENTIMIENTO_REQUERIDO', () => pm.expect(pm.response.json().codigo).to.eql('CONSENTIMIENTO_REQUERIDO'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Luis Pérez\",\n  \"correo\": \"luis.consent.{{$timestamp}}@ejemplo.com\",\n  \"intereses\": [3],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": false\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "06 · Interés inexistente (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Código INTERES_INEXISTENTE', () => pm.expect(pm.response.json().codigo).to.eql('INTERES_INEXISTENTE'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Luis Pérez\",\n  \"correo\": \"luis.interes.{{$timestamp}}@ejemplo.com\",\n  \"intereses\": [99],\n  \"password\": \"Secreta123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "07 · Contraseña corta (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Código PASSWORD_MINIMO', () => pm.expect(pm.response.json().codigo).to.eql('PASSWORD_MINIMO'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Luis Pérez\",\n  \"correo\": \"luis.pass.{{$timestamp}}@ejemplo.com\",\n  \"intereses\": [1],\n  \"password\": \"123\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    },
+    {
+      "name": "08 · OAuth sin idTokenExterno (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Código TOKEN_EXTERNO_OBLIGATORIO', () => pm.expect(pm.response.json().codigo).to.eql('TOKEN_EXTERNO_OBLIGATORIO'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Marta Ruiz\",\n  \"correo\": \"marta.oauth.{{$timestamp}}@ejemplo.com\",\n  \"intereses\": [2],\n  \"proveedor\": \"GOOGLE\",\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "registro"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8080" },
+    { "key": "correoRegistrado", "value": "" },
+    { "key": "idTurista", "value": "" }
+  ]
+}
