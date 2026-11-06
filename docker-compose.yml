@@ -1,0 +1,26 @@
+# MySQL para el equipo (alternativa portable al MySQL de usuario de esta máquina).
+# Uso:  cp .env.example .env  &&  docker compose up -d
+# El esquema NO se carga aquí: lo aplica Flyway al arrancar el backend.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: pdsw-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-turismo_eje_cafetero}
+      MYSQL_USER: ${DB_USER:-turismo_app}
+      MYSQL_PASSWORD: ${DB_PASS:?define DB_PASS en .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-root_local}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_ROOT_PASS:-root_local}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:
