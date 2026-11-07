@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.Controller;
+package co.edu.autonoma.turismo.api;
 
 import co.edu.autonoma.turismo.api.dto.Registro.RegistroOperadorRequest;
 import co.edu.autonoma.turismo.service.Registro.RegistroOperadorService;
@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -21,8 +22,9 @@ public class RegistroOperadorController {
         this.registroOperadorService = registroOperadorService;
     }
 
-    @PostMapping("/registro/operador")
-    @ResponseStatus(HttpStatus.CREATED)
+@PostMapping("/registro/operador")
+@PreAuthorize("hasRole('OPERADOR')")
+@ResponseStatus(HttpStatus.CREATED)
     public LoginResponse registrar(
             @Valid @RequestBody RegistroOperadorRequest request) {
 

@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.Controller;
+package co.edu.autonoma.turismo.api;
 
 import co.edu.autonoma.turismo.api.dto.Intereses.InteresResponse;
 import co.edu.autonoma.turismo.repository.InteresRepository;

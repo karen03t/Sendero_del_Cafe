@@ -1,5 +1,5 @@
 
-package co.edu.autonoma.turismo.api.Controller;
+package co.edu.autonoma.turismo.api;
 
 import co.edu.autonoma.turismo.api.dto.Lugar.LugarRequest;
 import co.edu.autonoma.turismo.api.dto.Lugar.LugarResponse;

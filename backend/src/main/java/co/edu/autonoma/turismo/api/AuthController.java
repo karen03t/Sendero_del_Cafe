@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.Controller;
+package co.edu.autonoma.turismo.api;
 
 import co.edu.autonoma.turismo.api.dto.Login.LoginRequest;
 import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
