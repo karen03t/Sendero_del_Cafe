@@ -1,0 +1,17 @@
+# Secretos y datos locales
+.env
+.env.*
+!.env.example
+
+# Base de datos local
+mysql_data/
+*.log
+
+# Build Java
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Editores
+.idea/
+*.iml
+.vscode/

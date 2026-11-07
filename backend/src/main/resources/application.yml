@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: turismo-backend
+  datasource:
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:turismo_eje_cafetero}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+    username: ${DB_USER:turismo_app}
+    password: ${DB_PASS:turismo_app}
+  jpa:
+    hibernate:
+      ddl-auto: none          # el esquema lo gobierna Flyway
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-cambiar-en-produccion-32bytes-minimo}
+    ttl-minutes: ${JWT_TTL_MINUTES:120}
+
+logging:
+  level:
+    co.edu.autonoma.turismo: INFO
