@@ -1,9 +1,9 @@
 
-package co.edu.autonoma.turismo.service;
+package co.edu.autonoma.turismo.service.Lugar;
 
-import co.edu.autonoma.turismo.api.dto.LugarRequest;
-import co.edu.autonoma.turismo.api.dto.LugarResponse;
-import co.edu.autonoma.turismo.api.dto.AuditoriaResponse;
+import co.edu.autonoma.turismo.api.dto.Lugar.LugarRequest;
+import co.edu.autonoma.turismo.api.dto.Lugar.LugarResponse;
+import co.edu.autonoma.turismo.api.dto.Auditoria.AuditoriaResponse;
 
 import co.edu.autonoma.turismo.domain.Lugar;
 import co.edu.autonoma.turismo.domain.AuditoriaLugar;

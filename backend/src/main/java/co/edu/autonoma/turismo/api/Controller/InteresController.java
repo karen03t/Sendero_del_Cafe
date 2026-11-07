@@ -1,6 +1,6 @@
-package co.edu.autonoma.turismo.api;
+package co.edu.autonoma.turismo.api.Controller;
 
-import co.edu.autonoma.turismo.api.dto.InteresResponse;
+import co.edu.autonoma.turismo.api.dto.Intereses.InteresResponse;
 import co.edu.autonoma.turismo.repository.InteresRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

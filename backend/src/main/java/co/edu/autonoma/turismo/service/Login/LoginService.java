@@ -1,7 +1,8 @@
-package co.edu.autonoma.turismo.service;
+package co.edu.autonoma.turismo.service.Login;
 
-import co.edu.autonoma.turismo.api.dto.LoginRequest;
-import co.edu.autonoma.turismo.api.dto.LoginResponse;
+import co.edu.autonoma.turismo.service.TokenService;
+import co.edu.autonoma.turismo.api.dto.Login.LoginRequest;
+import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
 import co.edu.autonoma.turismo.config.Rol;
 import co.edu.autonoma.turismo.domain.Operador;
 import co.edu.autonoma.turismo.domain.Turista;

@@ -1,8 +1,8 @@
-package co.edu.autonoma.turismo.api;
+package co.edu.autonoma.turismo.api.Controller;
 
-import co.edu.autonoma.turismo.api.dto.RegistroOperadorRequest;
-import co.edu.autonoma.turismo.service.RegistroOperadorService;
-import co.edu.autonoma.turismo.api.dto.LoginResponse;
+import co.edu.autonoma.turismo.api.dto.Registro.RegistroOperadorRequest;
+import co.edu.autonoma.turismo.service.Registro.RegistroOperadorService;
+import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
 
 import jakarta.validation.Valid;
 

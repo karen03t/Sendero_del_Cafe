@@ -1,5 +1,5 @@
 
-package co.edu.autonoma.turismo.api.dto;
+package co.edu.autonoma.turismo.api.dto.Auditoria;
 
 import co.edu.autonoma.turismo.domain.AuditoriaLugar;
 import java.time.LocalDateTime;

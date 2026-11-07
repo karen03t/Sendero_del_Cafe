@@ -1,11 +1,11 @@
 
-package co.edu.autonoma.turismo.api;
+package co.edu.autonoma.turismo.api.Controller;
 
-import co.edu.autonoma.turismo.api.dto.LugarRequest;
-import co.edu.autonoma.turismo.api.dto.LugarResponse;
-import co.edu.autonoma.turismo.api.dto.AuditoriaResponse;
+import co.edu.autonoma.turismo.api.dto.Lugar.LugarRequest;
+import co.edu.autonoma.turismo.api.dto.Lugar.LugarResponse;
+import co.edu.autonoma.turismo.api.dto.Auditoria.AuditoriaResponse;
 
-import co.edu.autonoma.turismo.service.LugarService;
+import co.edu.autonoma.turismo.service.Lugar.LugarService;
 
 import jakarta.validation.Valid;
 

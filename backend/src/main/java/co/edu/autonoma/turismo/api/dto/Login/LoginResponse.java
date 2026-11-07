@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.dto;
+package co.edu.autonoma.turismo.api.dto.Login;
 
 public record LoginResponse(
         String token,

@@ -1,6 +1,6 @@
 package co.edu.autonoma.turismo.exception;
 
-import co.edu.autonoma.turismo.api.dto.ErrorResponse;
+import co.edu.autonoma.turismo.api.dto.Error.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

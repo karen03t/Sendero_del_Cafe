@@ -1,5 +1,5 @@
 
-package co.edu.autonoma.turismo.api.dto;
+package co.edu.autonoma.turismo.api.dto.Lugar;
 
 import co.edu.autonoma.turismo.domain.Lugar;
 
