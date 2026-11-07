@@ -1,37 +1,38 @@
+
 package co.edu.autonoma.turismo.service.Registro;
 
-import co.edu.autonoma.turismo.service.TokenService;
 import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
+import co.edu.autonoma.turismo.api.dto.Registro.RegistroOperadorRequest;
 import co.edu.autonoma.turismo.config.Rol;
 import co.edu.autonoma.turismo.domain.Operador;
-import co.edu.autonoma.turismo.api.dto.Registro.RegistroOperadorRequest;
 import co.edu.autonoma.turismo.repository.OperadorRepository;
 import co.edu.autonoma.turismo.repository.TuristaRepository;
+import co.edu.autonoma.turismo.service.TokenService;
+import co.edu.autonoma.turismo.exception.ApiException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Locale;
 
 @Service
 public class RegistroOperadorService {
 
-    private final OperadorRepository operadorRepository;
-    private final TuristaRepository turistaRepository;
+    private final OperadorRepository operadores;
+    private final TuristaRepository turistas;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
     public RegistroOperadorService(
-            OperadorRepository operadorRepository,
-            TuristaRepository turistaRepository,
+            OperadorRepository operadores,
+            TuristaRepository turistas,
             PasswordEncoder passwordEncoder,
-            TokenService tokenService) {
-
-        this.operadorRepository = operadorRepository;
-        this.turistaRepository = turistaRepository;
+            TokenService tokenService
+    ) {
+        this.operadores = operadores;
+        this.turistas = turistas;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
     }
@@ -39,42 +40,43 @@ public class RegistroOperadorService {
     @Transactional
     public LoginResponse registrar(RegistroOperadorRequest request) {
 
-        // 1. Normalizar el correo
         String correo = request.correo()
                 .trim()
                 .toLowerCase(Locale.ROOT);
 
-        // 2. Verificar que no exista como turista ni operador
-        if (turistaRepository.existsByCorreoIgnoreCase(correo)
-                || operadorRepository.existsByCorreoIgnoreCase(correo)) {
+        String nombre = request.nombreCompleto().trim();
 
-            throw new ResponseStatusException(
+        // Evitar correos duplicados en ambas entidades.
+        if (operadores.existsByCorreoIgnoreCase(correo)
+                || turistas.existsByCorreoIgnoreCase(correo)) {
+
+            throw new ApiException(
                     HttpStatus.CONFLICT,
-                    "El correo ya se encuentra registrado"
+                    "CORREO_DUPLICADO",
+                    "Ya existe una cuenta con este correo"
             );
         }
 
-        // 3. Encriptar la contraseña
-        String passwordHash = passwordEncoder.encode(request.password());
+        // Encriptar contraseña.
+        String passwordHash =
+                passwordEncoder.encode(request.password());
 
-        // 4. Crear el operador
+        // Crear y guardar operador.
         Operador operador = new Operador(
-                request.nombreCompleto().trim(),
+                nombre,
                 correo,
                 passwordHash
         );
 
-        // 5. Guardar en la base de datos
-        Operador operadorGuardado = operadorRepository.save(operador);
+        operador = operadores.save(operador);
 
-        // 6. Generar token con rol OPERADOR
+        // Generar JWT con rol OPERADOR.
         String token = tokenService.generar(
-                operadorGuardado.getId(),
-                operadorGuardado.getCorreo(),
+                operador.getId(),
+                operador.getCorreo(),
                 Rol.OPERADOR
         );
 
-        // 7. Retornar respuesta
         return new LoginResponse(
                 token,
                 "Bearer",

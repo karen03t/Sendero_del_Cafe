@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -43,52 +44,60 @@ public class SecurityConfig {
                     )
             )
 
-            .authorizeHttpRequests(auth -> auth
 
-                // Registro y login públicos.
-                .requestMatchers("/api/v1/auth/**").permitAll()
+.authorizeHttpRequests(auth -> auth
 
-                // Consulta pública de intereses.
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/v1/intereses",
-                        "/api/v1/intereses/**"
-                ).permitAll()
+    // Registro y login públicos.
+    .requestMatchers(
+        "/api/v1/auth/registro",
+        "/api/v1/auth/registro/operador",
+        "/api/v1/auth/login",
+        "/api/v1/auth/operador/login"
+    ).permitAll()
 
-                // Auditoría: solamente operadores.
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/v1/lugares/*/auditoria"
-                ).hasRole("OPERADOR")
+    // Consulta pública de intereses.
+    .requestMatchers(
+        HttpMethod.GET,
+        "/api/v1/intereses",
+        "/api/v1/intereses/**"
+    ).permitAll()
 
-                // Consulta pública de lugares.
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/v1/lugares",
-                        "/api/v1/lugares/*"
-                ).permitAll()
+    // Auditoría exclusiva de operadores.
+    .requestMatchers(
+        HttpMethod.GET,
+        "/api/v1/lugares/*/auditoria"
+    ).hasRole("OPERADOR")
 
-                // Crear lugares: solamente operadores.
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/v1/lugares"
-                ).hasRole("OPERADOR")
+    // Consultas públicas de lugares.
+    .requestMatchers(
+        HttpMethod.GET,
+        "/api/v1/lugares",
+        "/api/v1/lugares/*"
+    ).permitAll()
 
-                // Actualizar lugares: solamente operadores.
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/v1/lugares/**"
-                ).hasRole("OPERADOR")
+    // Administración de lugares.
+    .requestMatchers(
+        HttpMethod.POST,
+        "/api/v1/lugares"
+    ).hasRole("OPERADOR")
 
-                .requestMatchers(
-                        HttpMethod.PATCH,
-                        "/api/v1/lugares/**"
-                ).hasRole("OPERADOR")
+    .requestMatchers(
+        HttpMethod.PUT,
+        "/api/v1/lugares/**"
+    ).hasRole("OPERADOR")
 
-                // Cualquier otra ruta requiere autenticación.
-                .anyRequest().authenticated()
-            )
+    .requestMatchers(
+        HttpMethod.PATCH,
+        "/api/v1/lugares/**"
+    ).hasRole("OPERADOR")
 
+    .requestMatchers(
+        HttpMethod.DELETE,
+        "/api/v1/lugares/**"
+    ).hasRole("OPERADOR")
+
+    .anyRequest().authenticated()
+)
             .addFilterBefore(
                     jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter.class
@@ -97,18 +106,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Evita registrar el filtro dos veces.
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter>
-            jwtFilterRegistration(
-                    JwtAuthenticationFilter filter
-            ) {
-
+            jwtAuthenticationFilterRegistration() {
         FilterRegistrationBean<JwtAuthenticationFilter> registration =
-                new FilterRegistrationBean<>(filter);
-
+                new FilterRegistrationBean<>(jwtAuthenticationFilter);
         registration.setEnabled(false);
-
         return registration;
     }
 }

@@ -1,3 +1,4 @@
+
 package co.edu.autonoma.turismo.service.Login;
 
 import co.edu.autonoma.turismo.service.TokenService;
@@ -12,6 +13,7 @@ import co.edu.autonoma.turismo.repository.TuristaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -36,51 +38,13 @@ public class LoginService {
 
         public Optional<LoginResponse> autenticar(LoginRequest request) {
 
-                String correo = request.correo().trim();
+                String correo = request.correo()
+                        .trim()
+                        .toLowerCase(Locale.ROOT);
 
-                // 1. Buscar primero al turista.
-                Optional<Turista> turistaEncontrado =
-                        turistas.findByCorreoIgnoreCase(correo);
+                String password = request.password();
 
-                if (turistaEncontrado.isPresent()) {
-
-                Turista turista = turistaEncontrado.get();
-
-                // Verificar que esté activo.
-                if (turista.getEstado() != Turista.EstadoTurista.ACTIVO) {
-                        return Optional.empty();
-                }
-
-                // El login con contraseña solo aplica a cuentas locales.
-                if (turista.getProveedor() != Turista.Proveedor.LOCAL) {
-                        return Optional.empty();
-                }
-
-                if (turista.getPasswordHash() == null ||
-                        !passwordEncoder.matches(
-                                request.password(),
-                                turista.getPasswordHash()
-                        )) {
-                        return Optional.empty();
-                }
-
-                // Generar token de turista.
-                String token = tokenService.generar(
-                        turista.getId(),
-                        turista.getCorreo(),
-                        Rol.TURISTA
-                );
-
-                return Optional.of(
-                        new LoginResponse(
-                                token,
-                                "Bearer",
-                                Rol.TURISTA.name()
-                        )
-                );
-                }
-
-                // 2. Si no existe como turista, buscar como operador.
+                // 1. Buscar primero al operador.
                 Optional<Operador> operadorEncontrado =
                         operadores.findByCorreoIgnoreCase(correo);
 
@@ -94,13 +58,12 @@ public class LoginService {
 
                 if (operador.getPasswordHash() == null ||
                         !passwordEncoder.matches(
-                                request.password(),
+                                password,
                                 operador.getPasswordHash()
                         )) {
                         return Optional.empty();
                 }
 
-                // Generar token de operador.
                 String token = tokenService.generar(
                         operador.getId(),
                         operador.getCorreo(),
@@ -116,7 +79,46 @@ public class LoginService {
                 );
                 }
 
-                // 3. No existe ningún usuario con ese correo.
+                // 2. Si no es operador, buscar al turista.
+                Optional<Turista> turistaEncontrado =
+                        turistas.findByCorreoIgnoreCase(correo);
+
+                if (turistaEncontrado.isPresent()) {
+
+                Turista turista = turistaEncontrado.get();
+
+                if (turista.getEstado() != Turista.EstadoTurista.ACTIVO) {
+                        return Optional.empty();
+                }
+
+                if (turista.getProveedor() != Turista.Proveedor.LOCAL) {
+                        return Optional.empty();
+                }
+
+                if (turista.getPasswordHash() == null ||
+                        !passwordEncoder.matches(
+                                password,
+                                turista.getPasswordHash()
+                        )) {
+                        return Optional.empty();
+                }
+
+                String token = tokenService.generar(
+                        turista.getId(),
+                        turista.getCorreo(),
+                        Rol.TURISTA
+                );
+
+                return Optional.of(
+                        new LoginResponse(
+                                token,
+                                "Bearer",
+                                Rol.TURISTA.name()
+                        )
+                );
+                }
+
+                // 3. Ningún usuario encontrado.
                 return Optional.empty();
         }
         }
