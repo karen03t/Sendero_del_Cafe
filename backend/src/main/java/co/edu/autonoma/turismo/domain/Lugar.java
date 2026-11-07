@@ -2,10 +2,10 @@
 package co.edu.autonoma.turismo.domain;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-## Clase que representa un lugar turístico en el sistema de turismo.
 @Entity
 @Table(name = "lugar")
 public class Lugar {
@@ -39,7 +39,7 @@ public class Lugar {
     private String estado = "ACTIVO";
 
     @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion = LocalDateTime.now();
+    private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
@@ -50,9 +50,16 @@ public class Lugar {
     protected Lugar() {
     }
 
-    ## Constructor para crear un nuevo lugar turístico
-
-    public Lugar(String id, String nombre, String descripcion,String categoria, String direccion,String municipio, BigDecimal latitud,BigDecimal longitud, String operadorCreacionId) {
+    public Lugar(
+            String id,
+            String nombre,
+            String descripcion,
+            String categoria,
+            String direccion,
+            String municipio,
+            BigDecimal latitud,
+            BigDecimal longitud,
+            String operadorCreacionId) {
 
         this.id = id;
         this.nombre = nombre;
@@ -63,9 +70,30 @@ public class Lugar {
         this.latitud = latitud;
         this.longitud = longitud;
         this.operadorCreacionId = operadorCreacionId;
+        this.estado = "ACTIVO";
     }
 
-    public void actualizar(String nombre, String descripcion,String categoria, String direccion,String municipio, BigDecimal latitud,BigDecimal longitud) {
+    @PrePersist
+    protected void antesDeGuardar() {
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void antesDeActualizar() {
+        fechaActualizacion = LocalDateTime.now();
+    }
+
+    public void actualizar(
+            String nombre,
+            String descripcion,
+            String categoria,
+            String direccion,
+            String municipio,
+            BigDecimal latitud,
+            BigDecimal longitud) {
+
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.categoria = categoria;
@@ -73,12 +101,10 @@ public class Lugar {
         this.municipio = municipio;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.fechaActualizacion = LocalDateTime.now();
     }
 
     public void inactivar() {
         this.estado = "INACTIVO";
-        this.fechaActualizacion = LocalDateTime.now();
     }
 
     public String getId() { return id; }

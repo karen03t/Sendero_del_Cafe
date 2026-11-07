@@ -4,7 +4,7 @@ package co.edu.autonoma.turismo.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-## Clase que representa la auditoría de cambios en los lugares turísticos respecto a los operadores municipales.
+// Clase que representa la auditoría de cambios en los lugares turísticos respecto a los operadores municipales.
 @Entity
 @Table(name = "auditoria_lugar")
 public class AuditoriaLugar {

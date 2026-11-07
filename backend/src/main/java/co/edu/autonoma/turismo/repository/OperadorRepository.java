@@ -1,4 +1,3 @@
-
 package co.edu.autonoma.turismo.repository;
 
 import co.edu.autonoma.turismo.domain.Operador;

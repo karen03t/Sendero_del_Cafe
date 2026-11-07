@@ -22,8 +22,8 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:dev-secret-cambiar-en-produccion-32bytes-minimo}
-    ttl-minutes: ${JWT_TTL_MINUTES:120}
+    secret: HvtY95VzPnzZiFvBFrVfYrS1Qym5B3Ur2RPa/aBfYcX0vAuhX3+UGjdOxkrIv8MoURDkgBAgKEnActUXh3cD3g==
+    ttl-minutes: 120
 
 logging:
   level:

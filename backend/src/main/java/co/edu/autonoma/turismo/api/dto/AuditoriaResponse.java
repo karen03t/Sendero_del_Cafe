@@ -4,7 +4,7 @@ package co.edu.autonoma.turismo.api.dto;
 import co.edu.autonoma.turismo.domain.AuditoriaLugar;
 import java.time.LocalDateTime;
 
-## DTO para la respuesta de una auditoría de cambios en un lugar turístico, O SEA, para enviar la información de una auditoría al cliente.
+// DTO para la respuesta de una auditoría de cambios en un lugar turístico, O SEA, para enviar la información de una auditoría al cliente.
 public record AuditoriaResponse(
     Long id,
     String lugarId,

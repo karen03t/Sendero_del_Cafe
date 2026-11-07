@@ -4,7 +4,7 @@ package co.edu.autonoma.turismo.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-## Clase que representa un operador municipal en el sistema de turismo. Es aquel que tiene la responsabilidad de gestionar los lugares turísticos en su municipio.
+// Clase que representa un operador municipal en el sistema de turismo. Es aquel que tiene la responsabilidad de gestionar los lugares turísticos en su municipio.
 @Entity
 @Table(name = "operador_municipal")
 public class Operador {

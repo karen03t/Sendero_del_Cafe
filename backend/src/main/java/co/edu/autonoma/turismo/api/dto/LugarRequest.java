@@ -2,38 +2,41 @@
 package co.edu.autonoma.turismo.api.dto;
 
 import jakarta.validation.constraints.*;
+
 import java.math.BigDecimal;
 
-## DTO para la solicitud de creación o actualización de un lugar turístico.
 public record LugarRequest(
 
     @NotBlank(message = "NOMBRE_OBLIGATORIO")
-    @Size(max = 200)
+    @Size(max = 200, message = "NOMBRE_MAXIMO_200")
     String nombre,
 
     @NotBlank(message = "DESCRIPCION_OBLIGATORIA")
+    @Size(max = 5000, message = "DESCRIPCION_MAXIMO_5000")
     String descripcion,
 
     @NotBlank(message = "CATEGORIA_OBLIGATORIA")
-    @Size(max = 100)
+    @Size(max = 100, message = "CATEGORIA_MAXIMO_100")
     String categoria,
 
     @NotBlank(message = "DIRECCION_OBLIGATORIA")
-    @Size(max = 255)
+    @Size(max = 255, message = "DIRECCION_MAXIMO_255")
     String direccion,
 
     @NotBlank(message = "MUNICIPIO_OBLIGATORIO")
-    @Size(max = 100)
+    @Size(max = 100, message = "MUNICIPIO_MAXIMO_100")
     String municipio,
 
     @NotNull(message = "LATITUD_OBLIGATORIA")
-    @DecimalMin("-90.0")
-    @DecimalMax("90.0")
+    @DecimalMin(value = "-90.0", message = "LATITUD_MINIMA")
+    @DecimalMax(value = "90.0", message = "LATITUD_MAXIMA")
+    @Digits(integer = 3, fraction = 7, message = "LATITUD_PRECISION_INVALIDA")
     BigDecimal latitud,
 
     @NotNull(message = "LONGITUD_OBLIGATORIA")
-    @DecimalMin("-180.0")
-    @DecimalMax("180.0")
+    @DecimalMin(value = "-180.0", message = "LONGITUD_MINIMA")
+    @DecimalMax(value = "180.0", message = "LONGITUD_MAXIMA")
+    @Digits(integer = 3, fraction = 7, message = "LONGITUD_PRECISION_INVALIDA")
     BigDecimal longitud
 
 ) {}

@@ -2,10 +2,12 @@
 package co.edu.autonoma.turismo.api.dto;
 
 import co.edu.autonoma.turismo.domain.Lugar;
-import java.math.BigDecimal;
 
-## DTO para la respuesta de un lugar turístico O SEA, para enviar la información de un lugar turístico al cliente.
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 public record LugarResponse(
+
     String id,
     String nombre,
     String descripcion,
@@ -14,10 +16,14 @@ public record LugarResponse(
     String municipio,
     BigDecimal latitud,
     BigDecimal longitud,
-    String estado
+    String estado,
+    LocalDateTime fechaCreacion,
+    LocalDateTime fechaActualizacion
+
 ) {
 
     public static LugarResponse desde(Lugar lugar) {
+
         return new LugarResponse(
             lugar.getId(),
             lugar.getNombre(),
@@ -27,7 +33,9 @@ public record LugarResponse(
             lugar.getMunicipio(),
             lugar.getLatitud(),
             lugar.getLongitud(),
-            lugar.getEstado()
+            lugar.getEstado(),
+            lugar.getFechaCreacion(),
+            lugar.getFechaActualizacion()
         );
     }
 }
