@@ -30,17 +30,33 @@ public class LugarController {
         this.lugarService = lugarService;
     }
 
-    // Consulta pública: solamente lugares activos.
+    // =====================================================
+    // RF-02: EXPLORAR Y CONSULTAR SITIOS DE INTERES
+    // =====================================================
+
+    // Consultar y filtrar exclusivamente lugares activos.
     @GetMapping
-    public List<LugarResponse> listar() {
-        return lugarService.listarActivos();
+    public List<LugarResponse> listar(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String municipio) {
+
+        return lugarService.buscarActivos(
+            nombre,
+            categoria,
+            municipio
+        );
     }
 
-    // Consulta pública de un lugar activo.
+    // Consultar el detalle de un lugar activo.
     @GetMapping("/{id}")
     public LugarResponse obtener(@PathVariable String id) {
         return lugarService.obtenerActivo(id);
     }
+
+    // =====================================================
+    // RF-05: ADMINISTRACION DE LUGARES
+    // =====================================================
 
     // CA-05: registrar lugar.
     @PostMapping

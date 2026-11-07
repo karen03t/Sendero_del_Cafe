@@ -42,6 +42,10 @@ public class LugarService {
         this.objectMapper = objectMapper;
     }
 
+    // =====================================================
+    // RF-05: ADMINISTRACION DE LUGARES
+    // =====================================================
+
     // CA-05: registrar un lugar turístico.
     @Transactional
     public LugarResponse registrar(
@@ -82,6 +86,10 @@ public class LugarService {
         return LugarResponse.desde(lugar);
     }
 
+    // =====================================================
+    // RF-02: EXPLORAR Y CONSULTAR SITIOS DE INTERES
+    // =====================================================
+
     // RN-01: listar exclusivamente lugares activos.
     @Transactional(readOnly = true)
     public List<LugarResponse> listarActivos() {
@@ -92,7 +100,29 @@ public class LugarService {
             .toList();
     }
 
-    // Consultar un lugar activo.
+    // RF-02: buscar lugares por nombre, categoría y municipio.
+    // Todos los filtros son opcionales y pueden combinarse.
+    @Transactional(readOnly = true)
+    public List<LugarResponse> buscarActivos(
+            String nombre,
+            String categoria,
+            String municipio) {
+
+        nombre = normalizarFiltro(nombre);
+        categoria = normalizarFiltro(categoria);
+        municipio = normalizarFiltro(municipio);
+
+        return lugares.buscarActivos(
+                nombre,
+                categoria,
+                municipio
+            )
+            .stream()
+            .map(LugarResponse::desde)
+            .toList();
+    }
+
+    // Consultar el detalle de un lugar activo.
     @Transactional(readOnly = true)
     public LugarResponse obtenerActivo(String id) {
 
@@ -100,6 +130,20 @@ public class LugarService {
 
         return LugarResponse.desde(lugar);
     }
+
+    // Normalizar filtros de búsqueda.
+    private String normalizarFiltro(String valor) {
+
+        if (valor == null || valor.isBlank()) {
+            return null;
+        }
+
+        return valor.trim();
+    }
+
+    // =====================================================
+    // RF-05: ACTUALIZAR LUGARES
+    // =====================================================
 
     // CA-05 / RN-07: actualizar un lugar.
     @Transactional
@@ -181,6 +225,10 @@ public class LugarService {
         );
     }
 
+    // =====================================================
+    // RF-05: AUDITORIA
+    // =====================================================
+
     // D-04: consultar la trazabilidad de un lugar.
     @Transactional(readOnly = true)
     public List<AuditoriaResponse> consultarAuditoria(
@@ -201,6 +249,11 @@ public class LugarService {
             .toList();
     }
 
+    // =====================================================
+    // METODOS AUXILIARES
+    // =====================================================
+
+    // Buscar un lugar exclusivamente si está activo.
     private Lugar buscarActivo(String id) {
 
         return lugares.findByIdAndEstado(id, "ACTIVO")
@@ -211,6 +264,7 @@ public class LugarService {
             ));
     }
 
+    // Validar la identificación del operador.
     private void validarOperador(String operadorId) {
 
         if (operadorId == null || operadorId.isBlank()) {
@@ -222,6 +276,7 @@ public class LugarService {
         }
     }
 
+    // Comparar valores para registrar modificaciones.
     private void comparar(
             Map<String, Object> cambios,
             String campo,
@@ -240,6 +295,7 @@ public class LugarService {
         }
     }
 
+    // Registrar auditoría en formato JSON.
     private void registrarAuditoria(
             String lugarId,
             String operadorId,
