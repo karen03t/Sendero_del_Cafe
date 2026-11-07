@@ -1,4 +1,3 @@
-
 package co.edu.autonoma.turismo.security;
 
 import co.edu.autonoma.turismo.config.Rol;
@@ -34,19 +33,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain)
-            throws ServletException, IOException {
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String encabezado = request.getHeader("Authorization");
 
-        if (encabezado != null &&
-                encabezado.startsWith("Bearer ")) {
+        if (encabezado != null && encabezado.startsWith("Bearer ")) {
 
             String token = encabezado.substring(7);
 
             try {
+
                 Claims claims =
-                    tokenService.validarYObtenerClaims(token);
+                        tokenService.validarYObtenerClaims(token);
 
                 String usuarioId = claims.getSubject();
                 String rol = claims.get("rol", String.class);
@@ -54,26 +53,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (usuarioId != null &&
                         rol != null &&
                         SecurityContextHolder.getContext()
-                            .getAuthentication() == null) {
+                                .getAuthentication() == null) {
 
+                    // Comprobar que el rol exista.
                     Rol.valueOf(rol);
 
-                    var autoridad = new SimpleGrantedAuthority(
-                        "ROLE_" + rol
-                    );
+                    // Spring Security espera ROLE_OPERADOR o ROLE_TURISTA.
+                    SimpleGrantedAuthority autoridad =
+                            new SimpleGrantedAuthority("ROLE_" + rol);
 
-                    var autenticacion =
-                        new UsernamePasswordAuthenticationToken(
-                            usuarioId,
-                            null,
-                            List.of(autoridad)
-                        );
+                    UsernamePasswordAuthenticationToken autenticacion =
+                            new UsernamePasswordAuthenticationToken(
+                                    usuarioId,
+                                    null,
+                                    List.of(autoridad)
+                            );
 
                     SecurityContextHolder.getContext()
-                        .setAuthentication(autenticacion);
+                            .setAuthentication(autenticacion);
                 }
 
             } catch (JwtException | IllegalArgumentException ex) {
+
                 SecurityContextHolder.clearContext();
             }
         }

@@ -1,4 +1,3 @@
-
 package co.edu.autonoma.turismo.config;
 
 import co.edu.autonoma.turismo.security.JwtAuthenticationFilter;
@@ -25,82 +24,88 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http
+    ) throws Exception {
 
         http
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+                    session.sessionCreationPolicy(
+                            SessionCreationPolicy.STATELESS
+                    )
             )
 
             .authorizeHttpRequests(auth -> auth
 
-                // Registro e inicio de sesión.
+                // Registro y login públicos.
                 .requestMatchers("/api/v1/auth/**").permitAll()
 
-                // Catálogo público de intereses.
+                // Consulta pública de intereses.
                 .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/v1/intereses",
-                    "/api/v1/intereses/**"
+                        HttpMethod.GET,
+                        "/api/v1/intereses",
+                        "/api/v1/intereses/**"
                 ).permitAll()
 
-                // Auditoría exclusiva de operadores.
+                // Auditoría: solamente operadores.
                 .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/v1/lugares/*/auditoria"
+                        HttpMethod.GET,
+                        "/api/v1/lugares/*/auditoria"
                 ).hasRole("OPERADOR")
 
                 // Consulta pública de lugares.
                 .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/v1/lugares",
-                    "/api/v1/lugares/*"
+                        HttpMethod.GET,
+                        "/api/v1/lugares",
+                        "/api/v1/lugares/*"
                 ).permitAll()
 
-                // Operaciones administrativas.
+                // Crear lugares: solamente operadores.
                 .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/v1/lugares"
+                        HttpMethod.POST,
+                        "/api/v1/lugares"
+                ).hasRole("OPERADOR")
+
+                // Actualizar lugares: solamente operadores.
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/v1/lugares/**"
                 ).hasRole("OPERADOR")
 
                 .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/v1/lugares/**"
+                        HttpMethod.PATCH,
+                        "/api/v1/lugares/**"
                 ).hasRole("OPERADOR")
 
-                .requestMatchers(
-                    HttpMethod.PATCH,
-                    "/api/v1/lugares/**"
-                ).hasRole("OPERADOR")
-
+                // Cualquier otra ruta requiere autenticación.
                 .anyRequest().authenticated()
             )
 
             .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
+                    jwtAuthenticationFilter,
+                    UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();
     }
 
-    // Evita que el filtro JWT se registre dos veces.
+    // Evita registrar el filtro dos veces.
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter>
-            jwtFilterRegistration(JwtAuthenticationFilter filter) {
+            jwtFilterRegistration(
+                    JwtAuthenticationFilter filter
+            ) {
 
         FilterRegistrationBean<JwtAuthenticationFilter> registration =
-            new FilterRegistrationBean<>(filter);
+                new FilterRegistrationBean<>(filter);
 
         registration.setEnabled(false);
 
