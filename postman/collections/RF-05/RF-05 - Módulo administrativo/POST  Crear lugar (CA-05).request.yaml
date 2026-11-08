@@ -1,0 +1,27 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/lugares
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre\": \"Mirador de Chipre\",\r
+
+    \    \"descripcion\": \"Mirador turístico con una vista panorámica de Manizales y sus paisajes montañosos.\",\r
+
+    \    \"categoria\": \"Mirador\",\r
+
+    \    \"direccion\": \"Barrio Chipre\",\r
+
+    \    \"municipio\": \"Manizales\",\r
+
+    \    \"latitud\": 5.0675000,\r
+
+    \    \"longitud\": -75.5215000\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_16gz}}"
+order: 3000

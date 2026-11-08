@@ -1,6 +1,5 @@
 package co.edu.autonoma.turismo.exception;
 
-import co.edu.autonoma.turismo.api.dto.Error.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +7,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import co.edu.autonoma.turismo.api.dto.error.ErrorResponse;
 
 import java.util.Comparator;
 import java.util.List;

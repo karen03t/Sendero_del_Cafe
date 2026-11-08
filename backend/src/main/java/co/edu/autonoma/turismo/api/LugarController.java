@@ -1,12 +1,10 @@
 
 package co.edu.autonoma.turismo.api;
 
-import co.edu.autonoma.turismo.api.dto.Lugar.LugarRequest;
-import co.edu.autonoma.turismo.api.dto.Lugar.LugarResponse;
-import co.edu.autonoma.turismo.api.dto.Auditoria.AuditoriaResponse;
-
-import co.edu.autonoma.turismo.service.Lugar.LugarService;
-
+import co.edu.autonoma.turismo.api.dto.auditoria.AuditoriaResponse;
+import co.edu.autonoma.turismo.api.dto.lugar.LugarRequest;
+import co.edu.autonoma.turismo.api.dto.lugar.LugarResponse;
+import co.edu.autonoma.turismo.service.lugar.LugarService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;

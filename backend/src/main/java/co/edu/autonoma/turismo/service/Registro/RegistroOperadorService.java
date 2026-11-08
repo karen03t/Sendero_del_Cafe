@@ -1,8 +1,8 @@
 
-package co.edu.autonoma.turismo.service.Registro;
+package co.edu.autonoma.turismo.service.registro;
 
-import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
-import co.edu.autonoma.turismo.api.dto.Registro.RegistroOperadorRequest;
+import co.edu.autonoma.turismo.api.dto.login.LoginResponse;
+import co.edu.autonoma.turismo.api.dto.registro.RegistroOperadorRequest;
 import co.edu.autonoma.turismo.config.Rol;
 import co.edu.autonoma.turismo.domain.Operador;
 import co.edu.autonoma.turismo.repository.OperadorRepository;

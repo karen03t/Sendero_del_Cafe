@@ -3,14 +3,17 @@ spring:
   application:
     name: turismo-backend
 
+  config:
+    import: optional:file:../.env[.properties]
+
   datasource:
     url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:turismo_eje_cafetero}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
-    username: turismo_app
-    password: 'Turismo2026_Seguro!'
+    username: ${DB_USER:sendero_app}
+    password: ${DB_PASS}
 
   jpa:
     hibernate:
-      ddl-auto: none # El esquema lo gobierna Flyway
+      ddl-auto: none
     open-in-view: false
     properties:
       hibernate:
@@ -26,12 +29,12 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:HvtY95VzPnzZiFvBFrVfYrS1Qym5B3Ur2RPa/aBfYcX0vAuhX3+UGjdOxkrIv8MoURDkgBAgKEnActUXh3cD3g==}
-    ttl-minutes: 120
+    secret: ${JWT_SECRET}
+    ttl-minutes: ${JWT_TTL_MINUTES:30}
 
   operador-inicial:
-    nombre: ${OPERADOR_INICIAL_NOMBRE:}
-    correo: ${OPERADOR_INICIAL_CORREO:}
+    nombre: ${OPERADOR_INICIAL_NOMBRE:Operador Municipal}
+    correo: ${OPERADOR_INICIAL_CORREO:operador@turismo.com}
     password: ${OPERADOR_INICIAL_PASSWORD:}
 
 logging:

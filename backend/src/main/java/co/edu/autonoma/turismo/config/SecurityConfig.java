@@ -1,3 +1,4 @@
+
 package co.edu.autonoma.turismo.config;
 
 import co.edu.autonoma.turismo.security.JwtAuthenticationFilter;
@@ -12,8 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
-import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -39,68 +38,77 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
-                    session.sessionCreationPolicy(
-                            SessionCreationPolicy.STATELESS
-                    )
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
             )
 
+            .authorizeHttpRequests(auth -> auth
 
-.authorizeHttpRequests(auth -> auth
+                // Registro público de turistas y login.
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/v1/auth/registro",
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/operador/login"
+                ).permitAll()
 
-    // Registro y login públicos.
-    .requestMatchers(
-        "/api/v1/auth/registro",
-        "/api/v1/auth/registro/operador",
-        "/api/v1/auth/login",
-        "/api/v1/auth/operador/login"
-    ).permitAll()
+                // Prohibir el registro público de operadores.
+                .requestMatchers(
+                    "/api/v1/auth/registro/operador"
+                ).denyAll()
 
-    // Consulta pública de intereses.
-    .requestMatchers(
-        HttpMethod.GET,
-        "/api/v1/intereses",
-        "/api/v1/intereses/**"
-    ).permitAll()
+                // Consulta pública de intereses.
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/intereses",
+                    "/api/v1/intereses/**"
+                ).permitAll()
 
-    // Auditoría exclusiva de operadores.
-    .requestMatchers(
-        HttpMethod.GET,
-        "/api/v1/lugares/*/auditoria"
-    ).hasRole("OPERADOR")
+                // Auditoría exclusiva de operadores.
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/lugares/*/auditoria"
+                ).hasRole("OPERADOR")
 
-    // Consultas públicas de lugares.
-    .requestMatchers(
-        HttpMethod.GET,
-        "/api/v1/lugares",
-        "/api/v1/lugares/*"
-    ).permitAll()
+                // Consultas públicas de lugares.
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/v1/lugares",
+                    "/api/v1/lugares/*"
+                ).permitAll()
 
-    // Administración de lugares.
-    .requestMatchers(
-        HttpMethod.POST,
-        "/api/v1/lugares"
-    ).hasRole("OPERADOR")
+                // Crear lugares: solo operadores.
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/v1/lugares"
+                ).hasRole("OPERADOR")
 
-    .requestMatchers(
-        HttpMethod.PUT,
-        "/api/v1/lugares/**"
-    ).hasRole("OPERADOR")
+                // Modificar lugares.
+                .requestMatchers(
+                    HttpMethod.PUT,
+                    "/api/v1/lugares/**"
+                ).hasRole("OPERADOR")
 
-    .requestMatchers(
-        HttpMethod.PATCH,
-        "/api/v1/lugares/**"
-    ).hasRole("OPERADOR")
+                // Inactivación lógica.
+                .requestMatchers(
+                    HttpMethod.PATCH,
+                    "/api/v1/lugares/**"
+                ).hasRole("OPERADOR")
 
-    .requestMatchers(
-        HttpMethod.DELETE,
-        "/api/v1/lugares/**"
-    ).hasRole("OPERADOR")
+                // Eliminar lugares.
+                .requestMatchers(
+                    HttpMethod.DELETE,
+                    "/api/v1/lugares/**"
+                ).hasRole("OPERADOR")
 
-    .anyRequest().authenticated()
-)
+                // Cualquier otra ruta requiere autenticación.
+                .anyRequest().authenticated()
+            )
+
             .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();
@@ -109,9 +117,12 @@ public class SecurityConfig {
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter>
             jwtAuthenticationFilterRegistration() {
+
         FilterRegistrationBean<JwtAuthenticationFilter> registration =
-                new FilterRegistrationBean<>(jwtAuthenticationFilter);
+            new FilterRegistrationBean<>(jwtAuthenticationFilter);
+
         registration.setEnabled(false);
+
         return registration;
     }
 }

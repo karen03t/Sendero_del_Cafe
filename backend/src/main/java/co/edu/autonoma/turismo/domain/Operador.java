@@ -19,11 +19,11 @@ public class Operador {
     @Column(nullable = false, unique = true, length = 255)
     private String correo;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
-    private String passwordHash;
-
     @Column(nullable = false, length = 10)
     private String estado = "ACTIVO";
+
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
@@ -46,6 +46,7 @@ public class Operador {
     public String getId() {
         return id;
     }
+
 
     public String getNombreCompleto() {
         return nombreCompleto;

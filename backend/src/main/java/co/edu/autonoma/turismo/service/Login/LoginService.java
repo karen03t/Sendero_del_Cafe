@@ -1,9 +1,9 @@
 
-package co.edu.autonoma.turismo.service.Login;
+package co.edu.autonoma.turismo.service.login;
 
 import co.edu.autonoma.turismo.service.TokenService;
-import co.edu.autonoma.turismo.api.dto.Login.LoginRequest;
-import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
+import co.edu.autonoma.turismo.api.dto.login.LoginRequest;
+import co.edu.autonoma.turismo.api.dto.login.LoginResponse;
 import co.edu.autonoma.turismo.config.Rol;
 import co.edu.autonoma.turismo.domain.Operador;
 import co.edu.autonoma.turismo.domain.Turista;
@@ -56,12 +56,22 @@ public class LoginService {
                         return Optional.empty();
                 }
 
-                if (operador.getPasswordHash() == null ||
-                        !passwordEncoder.matches(
-                                password,
-                                operador.getPasswordHash()
-                        )) {
-                        return Optional.empty();
+        boolean coincidePassword =
+                operador.getPasswordHash() != null
+                && passwordEncoder.matches(
+                        password,
+                        operador.getPasswordHash()
+                );
+
+                System.out.println("===== DIAGNOSTICO OPERADOR =====");
+                System.out.println("Correo: " + operador.getCorreo());
+                System.out.println("Estado: " + operador.getEstado());
+                System.out.println("Hash presente: " + (operador.getPasswordHash() != null));
+                System.out.println("BCrypt coincide: " + coincidePassword);
+                System.out.println("================================");
+
+                if (!coincidePassword) {
+                return Optional.empty();
                 }
 
                 String token = tokenService.generar(

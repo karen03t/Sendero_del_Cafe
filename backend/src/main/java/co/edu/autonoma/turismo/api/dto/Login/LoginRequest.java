@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.dto.Login;
+package co.edu.autonoma.turismo.api.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
 

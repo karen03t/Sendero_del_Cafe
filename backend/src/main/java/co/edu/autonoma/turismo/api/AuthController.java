@@ -1,14 +1,12 @@
 
 package co.edu.autonoma.turismo.api;
 
-import co.edu.autonoma.turismo.api.dto.Login.LoginRequest;
-import co.edu.autonoma.turismo.api.dto.Login.LoginResponse;
-import co.edu.autonoma.turismo.api.dto.Registro.RegistroRequest;
-import co.edu.autonoma.turismo.api.dto.Registro.RegistroResponse;
-
-import co.edu.autonoma.turismo.service.Login.LoginService;
-import co.edu.autonoma.turismo.service.Registro.RegistroService;
-
+import co.edu.autonoma.turismo.api.dto.login.LoginRequest;
+import co.edu.autonoma.turismo.api.dto.login.LoginResponse;
+import co.edu.autonoma.turismo.api.dto.registro.RegistroRequest;
+import co.edu.autonoma.turismo.api.dto.registro.RegistroResponse;
+import co.edu.autonoma.turismo.service.login.LoginService;
+import co.edu.autonoma.turismo.service.registro.RegistroService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;

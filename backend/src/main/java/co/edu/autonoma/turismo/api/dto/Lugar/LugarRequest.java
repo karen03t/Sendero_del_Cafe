@@ -1,5 +1,5 @@
 
-package co.edu.autonoma.turismo.api.dto.Lugar;
+package co.edu.autonoma.turismo.api.dto.lugar;
 
 import jakarta.validation.constraints.*;
 

@@ -1,0 +1,271 @@
+{
+  "info": {
+    "_postman_id": "2c50f695-dcec-4ccc-b17c-b583a7491c69",
+    "name": "RF-05",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44461435",
+    "_collection_link": "https://go.postman.co/collection/44461435-2c50f695-dcec-4ccc-b17c-b583a7491c69?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "RF-01 - Registro y autenticación",
+      "item": [
+        {
+          "name": "POST Registro turista",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombreCompleto\": \"Turista de Prueba\",\r\n  \"correo\": \"isa@gmail.com\",\r\n  \"password\": \"Turista2026*\",\r\n  \"aceptaTratamientoDatos\": true,\r\n  \"intereses\": [1]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8080/api/v1/auth/registro",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RF-02 - Consulta de lugares",
+      "item": [
+        {
+          "name": "GET Listar lugares activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Consultar lugar por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Categoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get municipio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get - Todo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RF-05 - Módulo administrativo",
+      "item": [
+        {
+          "name": "POST  Login operador",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST  Login turista",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"correo\": \"isa@gmail.com\",\r\n    \"password\": \"Turista2026*\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/turista/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "turista",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST  Crear lugar (CA-05)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_16gz}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Mirador de Chipre\",\r\n    \"descripcion\": \"Mirador turístico con una vista panorámica de Manizales y sus paisajes montañosos.\",\r\n    \"categoria\": \"Mirador\",\r\n    \"direccion\": \"Barrio Chipre\",\r\n    \"municipio\": \"Manizales\",\r\n    \"latitud\": 5.0675000,\r\n    \"longitud\": -75.5215000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lugares",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lugares"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST  Intentar crear lugar como turista (CA-07)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_00j9}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Mirador de Chipre\",\r\n    \"descripcion\": \"Mirador turístico con una vista panorámica de Manizales y sus paisajes montañosos.\",\r\n    \"categoria\": \"Mirador\",\r\n    \"direccion\": \"Barrio Chipre2\",\r\n    \"municipio\": \"Manizales\",\r\n    \"latitud\": 5.0675000,\r\n    \"longitud\": -75.5215000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/lugares/02b3b2c7-7305-42a0-bf56-fbde1d728cab",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "lugares",
+                "02b3b2c7-7305-42a0-bf56-fbde1d728cab"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH  Inactivar lugar (CA-08)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Consultar auditoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "json_web_token_16gz",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_00j9",
+      "secret": true
+    }
+  ]
+}
