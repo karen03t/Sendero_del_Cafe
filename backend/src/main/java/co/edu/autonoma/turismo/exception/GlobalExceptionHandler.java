@@ -51,7 +51,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> manejarIntegridad(DataIntegrityViolationException ex) {
+        // Las violaciones de FK/CHECK/UNIQUE no son "correo duplicado": ese codigo
+        // solo lo emiten los servicios cuando detectan el correo repetido a proposito.
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse("CORREO_DUPLICADO", "Ya existe una cuenta con este correo"));
+                .body(new ErrorResponse("CONFLICTO_DATOS", "La operacion entra en conflicto con los datos existentes"));
     }
 }

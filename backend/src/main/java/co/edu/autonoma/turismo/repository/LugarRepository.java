@@ -26,11 +26,11 @@ public interface LugarRepository extends JpaRepository<Lugar, String> {
         )
         AND (
             :categoria IS NULL
-            OR LOWER(l.categoria) LIKE LOWER(CONCAT('%', :categoria, '%'))
+            OR l.categoria = :categoria
         )
         AND (
             :municipio IS NULL
-            OR LOWER(l.municipio) LIKE LOWER(CONCAT('%', :municipio, '%'))
+            OR l.municipio = :municipio
         )
         ORDER BY l.nombre ASC
     """)

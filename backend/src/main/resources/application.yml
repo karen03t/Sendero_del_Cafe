@@ -8,7 +8,7 @@ spring:
 
   datasource:
     url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:turismo_eje_cafetero}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
-    username: ${DB_USER:sendero_app}
+    username: ${DB_USER:turismo_app}
     password: ${DB_PASS}
 
   jpa:

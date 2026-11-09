@@ -80,7 +80,7 @@ public class LugarService {
         datos.put("longitud", lugar.getLongitud());
         datos.put("estado", lugar.getEstado());
 
-        registrarAuditoria(id, operadorId, "CREACION", datos);
+        registrarAuditoria(id, operadorId, "CREAR", datos);
 
         return LugarResponse.desde(lugar);
     }
@@ -196,7 +196,7 @@ public class LugarService {
             req.longitud()
         );
 
-        registrarAuditoria(id, operadorId, "EDICION", cambios);
+        registrarAuditoria(id, operadorId, "EDITAR", cambios);
 
         return LugarResponse.desde(lugar);
     }
@@ -219,7 +219,7 @@ public class LugarService {
         registrarAuditoria(
             id,
             operadorId,
-            "INACTIVACION",
+            "INACTIVAR",
             cambios
         );
     }
@@ -242,7 +242,7 @@ public class LugarService {
         }
 
         return auditorias
-            .findByLugarIdOrderByFechaDesc(lugarId)
+            .findByLugarIdOrderByFechaDescIdDesc(lugarId)
             .stream()
             .map(AuditoriaResponse::desde)
             .toList();

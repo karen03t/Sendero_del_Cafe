@@ -9,5 +9,5 @@ import java.util.List;
 public interface AuditoriaLugarRepository
         extends JpaRepository<AuditoriaLugar, Long> {
 
-    List<AuditoriaLugar> findByLugarIdOrderByFechaDesc(String lugarId);
+    List<AuditoriaLugar> findByLugarIdOrderByFechaDescIdDesc(String lugarId);
 }

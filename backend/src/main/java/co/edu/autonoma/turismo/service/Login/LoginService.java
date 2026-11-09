@@ -63,13 +63,6 @@ public class LoginService {
                         operador.getPasswordHash()
                 );
 
-                System.out.println("===== DIAGNOSTICO OPERADOR =====");
-                System.out.println("Correo: " + operador.getCorreo());
-                System.out.println("Estado: " + operador.getEstado());
-                System.out.println("Hash presente: " + (operador.getPasswordHash() != null));
-                System.out.println("BCrypt coincide: " + coincidePassword);
-                System.out.println("================================");
-
                 if (!coincidePassword) {
                 return Optional.empty();
                 }
