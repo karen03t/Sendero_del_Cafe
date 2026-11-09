@@ -42,4 +42,4 @@ CREATE TABLE ruta_guardada (
 -- Índices para consultas frecuentes
 CREATE INDEX idx_ruta_municipio ON ruta (municipio);
 CREATE INDEX idx_ruta_estado ON ruta (estado);
-CREATE INDEX idx_rg_turista ON ruta_guardada (turista_id);
+
