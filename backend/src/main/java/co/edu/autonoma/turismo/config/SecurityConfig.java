@@ -102,6 +102,12 @@ public class SecurityConfig {
                     "/api/v1/lugares/**"
                 ).hasRole("OPERADOR")
 
+                // Rutas turisticas: solo el turista autenticado.
+                .requestMatchers(
+                    "/api/v1/rutas",
+                    "/api/v1/rutas/**"
+                ).hasRole("TURISTA")
+
                 // Cualquier otra ruta requiere autenticación.
                 .anyRequest().authenticated()
             )
