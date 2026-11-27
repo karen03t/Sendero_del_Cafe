@@ -1,6 +1,5 @@
 package co.edu.autonoma.turismo.exception;
 
-import co.edu.autonoma.turismo.api.dto.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +7,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import co.edu.autonoma.turismo.api.dto.error.ErrorResponse;
 
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +51,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> manejarIntegridad(DataIntegrityViolationException ex) {
+        // Las violaciones de FK/CHECK/UNIQUE no son "correo duplicado": ese codigo
+        // solo lo emiten los servicios cuando detectan el correo repetido a proposito.
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse("CORREO_DUPLICADO", "Ya existe una cuenta con este correo"));
+                .body(new ErrorResponse("CONFLICTO_DATOS", "La operacion entra en conflicto con los datos existentes"));
     }
 }

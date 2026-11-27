@@ -1,0 +1,395 @@
+{
+  "info": {
+    "name": "PDSW · RF-05 Módulo administrativo y RF-02 consulta pública",
+    "description": "Flujo completo del módulo del operador (login, crear, editar, inactivar, auditoría) y de la consulta pública de lugares. Ejecutar en orden: los requests guardan tokenOperador, tokenTurista e idLugar como variables de colección.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "tokenOperador",
+      "value": ""
+    },
+    {
+      "key": "tokenTurista",
+      "value": ""
+    },
+    {
+      "key": "idLugar",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · Registro de turista (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Turista Postman\",\n  \"correo\": \"turista.{{$timestamp}}@test.co\",\n  \"password\": \"Turista2026*Segura\",\n  \"intereses\": [1],\n  \"proveedor\": \"LOCAL\",\n  \"aceptaTratamientoDatos\": true\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/registro"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const b = pm.response.json();",
+              "pm.test('devuelve tokenSesion', () => pm.expect(b.tokenSesion).to.be.a('string').and.not.empty);",
+              "pm.collectionVariables.set('tokenTurista', b.tokenSesion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 · Login de operador (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"operador@sendero.co\",\n  \"password\": \"Operador2026*Segura\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('rol OPERADOR', () => pm.expect(b.rol).to.eql('OPERADOR'));",
+              "pm.test('trae token', () => pm.expect(b.token).to.be.a('string').and.not.empty);",
+              "pm.collectionVariables.set('tokenOperador', b.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 · CA-05 Crear lugar (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Mirador de Salento\",\n  \"descripcion\": \"Vista del valle de Cocora\",\n  \"categoria\": \"Ecológico\",\n  \"direccion\": \"Cra 5 #4-12\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.6371,\n  \"longitud\": -75.5706\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/lugares"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const b = pm.response.json();",
+              "pm.test('estado ACTIVO', () => pm.expect(b.estado).to.eql('ACTIVO'));",
+              "pm.test('devuelve id', () => pm.expect(b.id).to.be.a('string').and.not.empty);",
+              "pm.collectionVariables.set('idLugar', b.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · Listar lugares activos (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/lugares"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('incluye el lugar creado', () => pm.expect(b.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · Consultar detalle (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/lugares/{{idLugar}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('mismo lugar', () => pm.expect(b.id).to.eql(pm.collectionVariables.get('idLugar')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 · Filtrar por categoría (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/lugares?categoria=Ecol%C3%B3gico"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('devuelve solo ecológicos', () => pm.expect(b.every(l => l.categoria.toLowerCase() === 'ecológico')).to.be.true);",
+              "pm.test('incluye el lugar creado', () => pm.expect(b.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Filtrar por municipio (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/lugares?municipio=Salento"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('todos de Salento', () => pm.expect(b.every(l => l.municipio === 'Salento')).to.be.true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 · CA-06 Editar lugar (200)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Mirador de Salento (renovado)\",\n  \"descripcion\": \"Vista del valle de Cocora\",\n  \"categoria\": \"Ecológico\",\n  \"direccion\": \"Cra 5 #4-12\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.6371,\n  \"longitud\": -75.5706\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/lugares/{{idLugar}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('nombre actualizado', () => pm.expect(pm.response.json().nombre).to.eql('Mirador de Salento (renovado)'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 · CA-08 Inactivar lugar (200)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/lugares/{{idLugar}}/inactivar"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('código LUGAR_INACTIVADO', () => pm.expect(pm.response.json().codigo).to.eql('LUGAR_INACTIVADO'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 · Auditoría con las tres acciones (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/lugares/{{idLugar}}/auditoria"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "const acciones = b.map(a => a.accion);",
+              "pm.test('registra CREAR, EDITAR e INACTIVAR', () => pm.expect(acciones).to.eql(['INACTIVAR', 'EDITAR', 'CREAR']));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 · Crear sin token (401/403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Sin token\",\n  \"descripcion\": \"x\",\n  \"categoria\": \"Ecológico\",\n  \"direccion\": \"x\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.6,\n  \"longitud\": -75.5\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/lugares"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('rechaza sin token', () => pm.expect(pm.response.code).to.be.oneOf([401, 403]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 · Crear como turista (403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Como turista\",\n  \"descripcion\": \"x\",\n  \"categoria\": \"Ecológico\",\n  \"direccion\": \"x\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.6,\n  \"longitud\": -75.5\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/lugares"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · Registro público de operador bloqueado (403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Intruso\",\n  \"correo\": \"intruso.{{$timestamp}}@test.co\",\n  \"password\": \"Intruso2026*\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/registro/operador"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 · Login con credenciales inválidas (401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"operador@sendero.co\",\n  \"password\": \"clave-incorrecta\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+              "pm.test('código CREDENCIALES_INVALIDAS', () => pm.expect(pm.response.json().codigo).to.eql('CREDENCIALES_INVALIDAS'));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-package co.edu.autonoma.turismo.api.dto;
+package co.edu.autonoma.turismo.api.dto.registro;
 
 import java.util.List;
 

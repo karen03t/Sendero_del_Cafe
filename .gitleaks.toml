@@ -1,0 +1,19 @@
+# Configuracion de Gitleaks para el repositorio.
+#
+# Hallazgo historico: el commit b843a62 (rama de Backend, anterior a este PR)
+# incluyo un JWT_SECRET hardcodeado en application.yml. El archivo actual usa
+# ${JWT_SECRET} sin valor por defecto y el secreto local es distinto, pero el
+# valor sigue visible en el historial publico del repositorio.
+#
+# Se considera COMPROMETIDO: cualquiera que lo lea puede firmar tokens validos
+# si se despliega con el. Debe rotarse en el entorno donde se use. Esta
+# excepcion solo evita que el CI bloquee mientras el equipo decide si reescribe
+# el historial; no valida el secreto ni lo reutiliza.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "JWT de desarrollo filtrado en b843a62, ya eliminado y pendiente de rotacion"
+regexes = [
+  '''HvtY95VzPnzZiFvBFrVfYrS1Qym5B3Ur2RPa/aBfYcX0vAuhX3\+UGjdOxkrIv8MoURDkgBAgKEnActUXh3cD3g==''',
+]
