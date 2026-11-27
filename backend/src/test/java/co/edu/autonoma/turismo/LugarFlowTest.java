@@ -222,14 +222,18 @@ class LugarFlowTest {
         return peticion.retrieve().toEntity(new ParameterizedTypeReference<>() {});
     }
 
+    @SuppressWarnings("unchecked")
     private List<Map<String, Object>> filtrar(String query) {
-        ResponseEntity<List<Map<String, Object>>> respuesta = cliente.get()
-                .uri("/api/v1/lugares" + query)
+
+        String separador = query.contains("?") ? "&" : "?";
+
+        ResponseEntity<Map<String, Object>> respuesta = cliente.get()
+                .uri("/api/v1/lugares" + query + separador + "tamano=100")
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<>() {});
 
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
-        return respuesta.getBody();
+        return (List<Map<String, Object>>) respuesta.getBody().get("content");
     }
 
     private List<String> auditoria(String id) {

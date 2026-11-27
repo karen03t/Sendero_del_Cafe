@@ -80,12 +80,26 @@ public class RutaService {
                     "No hay lugares activos que cumplan el municipio y los intereses");
         }
 
-        Punto inicio = req.origen() != null
-                ? new Punto(req.origen().lat(), req.origen().lng())
+        GrafoRutas.Punto inicio = req.origen() != null
+                ? new GrafoRutas.Punto(req.origen().lat(), req.origen().lng())
                 : centroide(candidatos);
 
-        List<Lugar> seleccionados =
-                seleccionarPorTiempo(candidatos, inicio, req.tiempoDisponibleMin());
+        // Grafo disperso (4 vecinos) + Dijkstra: las distancias entre paradas
+        // pueden pasar por otros lugares en vez de ser linea recta.
+        List<GrafoRutas.Punto> nodos = new ArrayList<>();
+        for (Lugar candidato : candidatos) {
+            nodos.add(punto(candidato));
+        }
+        int indiceOrigen = nodos.size();
+        nodos.add(inicio);
+
+        double[][] distancias = new GrafoRutas(nodos, 4).todasLasDistancias();
+
+        List<Integer> seleccionados = seleccionarPorTiempo(
+                candidatos,
+                indiceOrigen,
+                distancias,
+                req.tiempoDisponibleMin());
 
         if (seleccionados.isEmpty()) {
             throw new ApiException(
@@ -94,12 +108,14 @@ public class RutaService {
                     "El tiempo disponible no alcanza para visitar un lugar");
         }
 
-        List<Lugar> ordenados = mejorar2Opt(seleccionados, inicio);
+        List<Integer> ordenados = mejorar2Opt(seleccionados, indiceOrigen, distancias);
 
         return construirPropuesta(
                 municipio,
-                inicio,
+                candidatos,
                 ordenados,
+                indiceOrigen,
+                distancias,
                 req.origen() != null);
     }
 
@@ -280,33 +296,39 @@ public class RutaService {
     }
 
     /**
-     * Vecino mas cercano con presupuesto: agrega la parada mas proxima que
-     * quepa en el tiempo disponible (desplazamiento + visita).
+     * Vecino mas cercano con presupuesto usando las distancias de Dijkstra:
+     * agrega la parada mas proxima que quepa en el tiempo disponible.
      */
-    private List<Lugar> seleccionarPorTiempo(
+    private List<Integer> seleccionarPorTiempo(
             List<Lugar> candidatos,
-            Punto inicio,
+            int indiceOrigen,
+            double[][] distancias,
             int tiempoDisponibleMin) {
 
-        List<Lugar> seleccionados = new ArrayList<>();
-        Set<String> usados = new HashSet<>();
+        List<Integer> seleccionados = new ArrayList<>();
+        Set<Integer> usados = new HashSet<>();
 
-        Punto actual = inicio;
+        int actual = indiceOrigen;
         int tiempoAcumulado = 0;
 
         while (seleccionados.size() < MAX_PARADAS) {
 
-            Lugar mejor = null;
+            Integer mejor = null;
             double mejorDistancia = Double.MAX_VALUE;
             int mejorTiempo = 0;
 
-            for (Lugar candidato : candidatos) {
+            for (int i = 0; i < candidatos.size(); i++) {
 
-                if (usados.contains(candidato.getId())) {
+                if (usados.contains(i)) {
                     continue;
                 }
 
-                double distancia = distanciaKm(actual, punto(candidato));
+                double distancia = distancias[actual][i];
+
+                if (Double.isInfinite(distancia)) {
+                    continue;
+                }
+
                 int minutos = (int) Math.round(distancia / VELOCIDAD_KMH * 60);
 
                 if (tiempoAcumulado + minutos + VISITA_MIN > tiempoDisponibleMin) {
@@ -316,7 +338,7 @@ public class RutaService {
                 if (distancia < mejorDistancia) {
                     mejorDistancia = distancia;
                     mejorTiempo = minutos;
-                    mejor = candidato;
+                    mejor = i;
                 }
             }
 
@@ -325,8 +347,8 @@ public class RutaService {
             }
 
             seleccionados.add(mejor);
-            usados.add(mejor.getId());
-            actual = punto(mejor);
+            usados.add(mejor);
+            actual = mejor;
             tiempoAcumulado += mejorTiempo + VISITA_MIN;
         }
 
@@ -334,28 +356,31 @@ public class RutaService {
     }
 
     /** Mejora 2-opt sobre el orden elegido. n <= 12, coste despreciable. */
-    private List<Lugar> mejorar2Opt(List<Lugar> paradas, Punto inicio) {
+    private List<Integer> mejorar2Opt(
+            List<Integer> paradas,
+            int indiceOrigen,
+            double[][] distancias) {
 
         if (paradas.size() < 3) {
             return new ArrayList<>(paradas);
         }
 
-        List<Lugar> mejor = new ArrayList<>(paradas);
+        List<Integer> mejor = new ArrayList<>(paradas);
         boolean huboMejora = true;
         int iteraciones = 0;
 
         while (huboMejora && iteraciones++ < 50) {
 
             huboMejora = false;
-            double costoActual = costo(mejor, inicio);
+            double costoActual = costo(mejor, indiceOrigen, distancias);
 
             for (int i = 1; i < mejor.size() - 1; i++) {
                 for (int j = i + 1; j < mejor.size(); j++) {
 
-                    List<Lugar> candidata = new ArrayList<>(mejor);
+                    List<Integer> candidata = new ArrayList<>(mejor);
                     Collections.reverse(candidata.subList(i, j + 1));
 
-                    double costoCandidato = costo(candidata, inicio);
+                    double costoCandidato = costo(candidata, indiceOrigen, distancias);
 
                     if (costoCandidato + 1e-9 < costoActual) {
                         mejor = candidata;
@@ -369,15 +394,17 @@ public class RutaService {
         return mejor;
     }
 
-    private double costo(List<Lugar> paradas, Punto inicio) {
+    private double costo(
+            List<Integer> paradas,
+            int indiceOrigen,
+            double[][] distancias) {
 
         double total = 0;
-        Punto anterior = inicio;
+        int anterior = indiceOrigen;
 
-        for (Lugar parada : paradas) {
-            Punto actual = punto(parada);
-            total += distanciaKm(anterior, actual);
-            anterior = actual;
+        for (int parada : paradas) {
+            total += distancias[anterior][parada];
+            anterior = parada;
         }
 
         return total;
@@ -385,22 +412,24 @@ public class RutaService {
 
     private PropuestaResponse construirPropuesta(
             String municipio,
-            Punto inicio,
-            List<Lugar> paradas,
+            List<Lugar> candidatos,
+            List<Integer> paradas,
+            int indiceOrigen,
+            double[][] distancias,
             boolean conOrigen) {
 
         List<ParadaResponse> respuestas = new ArrayList<>();
 
-        Punto anterior = inicio;
+        int anterior = indiceOrigen;
         double distanciaTotal = 0;
         int duracionTotal = 0;
 
         for (int i = 0; i < paradas.size(); i++) {
 
-            Lugar lugar = paradas.get(i);
-            Punto actual = punto(lugar);
+            int indice = paradas.get(i);
+            Lugar lugar = candidatos.get(indice);
 
-            double tramo = distanciaKm(anterior, actual);
+            double tramo = distancias[anterior][indice];
             int minutosTramo = (int) Math.round(tramo / VELOCIDAD_KMH * 60);
 
             distanciaTotal += tramo;
@@ -417,7 +446,7 @@ public class RutaService {
                     lugar.getLongitud().doubleValue(),
                     desdeAnterior));
 
-            anterior = actual;
+            anterior = indice;
         }
 
         return new PropuestaResponse(
@@ -435,24 +464,29 @@ public class RutaService {
 
         List<RutaLugar> paradas = new ArrayList<>();
 
-        Punto anterior = null;
+        List<GrafoRutas.Punto> nodos = new ArrayList<>();
+        for (Lugar lugar : seleccionados) {
+            nodos.add(punto(lugar));
+        }
+
+        double[][] distancias = new GrafoRutas(nodos, 4).todasLasDistancias();
+
         double distanciaTotal = 0;
         int duracionTotal = 0;
 
-        for (Lugar lugar : seleccionados) {
+        for (int i = 0; i < seleccionados.size(); i++) {
 
             int minutosTramo = 0;
 
-            if (anterior != null) {
-                double tramo = distanciaKm(anterior, punto(lugar));
+            if (i > 0) {
+                double tramo = distancias[i - 1][i];
                 distanciaTotal += tramo;
                 minutosTramo = (int) Math.round(tramo / VELOCIDAD_KMH * 60);
             }
 
             duracionTotal += minutosTramo + VISITA_MIN;
 
-            paradas.add(new RutaLugar(lugar, minutosTramo));
-            anterior = punto(lugar);
+            paradas.add(new RutaLugar(seleccionados.get(i), minutosTramo));
         }
 
         ruta.reemplazarParadas(paradas);
@@ -572,14 +606,13 @@ public class RutaService {
     // GEOGRAFIA
     // =====================================================
 
-    private record Punto(double lat, double lng) {
+    private GrafoRutas.Punto punto(Lugar lugar) {
+        return new GrafoRutas.Punto(
+                lugar.getLatitud().doubleValue(),
+                lugar.getLongitud().doubleValue());
     }
 
-    private Punto punto(Lugar lugar) {
-        return new Punto(lugar.getLatitud().doubleValue(), lugar.getLongitud().doubleValue());
-    }
-
-    private Punto centroide(List<Lugar> lugares) {
+    private GrafoRutas.Punto centroide(List<Lugar> lugares) {
 
         double lat = 0;
         double lng = 0;
@@ -589,10 +622,10 @@ public class RutaService {
             lng += lugar.getLongitud().doubleValue();
         }
 
-        return new Punto(lat / lugares.size(), lng / lugares.size());
+        return new GrafoRutas.Punto(lat / lugares.size(), lng / lugares.size());
     }
 
-    private double distanciaKm(Punto a, Punto b) {
+    private double distanciaKm(GrafoRutas.Punto a, GrafoRutas.Punto b) {
 
         double dLat = Math.toRadians(b.lat() - a.lat());
         double dLng = Math.toRadians(b.lng() - a.lng());

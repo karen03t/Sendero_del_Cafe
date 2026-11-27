@@ -16,6 +16,8 @@ import co.edu.autonoma.turismo.repository.AuditoriaLugarRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,26 +103,33 @@ public class LugarService {
             .toList();
     }
 
-    // RF-02: buscar lugares por nombre, categoría y municipio.
-    // Todos los filtros son opcionales y pueden combinarse.
+    // RF-02 / SCRUM-25: busqueda por nombre, categoria, municipio e interes,
+    // con paginacion. Todos los filtros son opcionales.
     @Transactional(readOnly = true)
-    public List<LugarResponse> buscarActivos(
+    public Page<LugarResponse> buscarActivos(
             String nombre,
             String categoria,
-            String municipio) {
+            String municipio,
+            String interes,
+            int pagina,
+            int tamano) {
 
         nombre = normalizarFiltro(nombre);
         categoria = normalizarFiltro(categoria);
         municipio = normalizarFiltro(municipio);
+        interes = normalizarFiltro(interes);
 
-        return lugares.buscarActivos(
+        int numeroPagina = Math.max(pagina, 0);
+        int elementos = Math.min(Math.max(tamano, 1), 100);
+
+        return lugares.buscarActivosPaginado(
                 nombre,
                 categoria,
-                municipio
+                municipio,
+                interes,
+                PageRequest.of(numeroPagina, elementos)
             )
-            .stream()
-            .map(LugarResponse::desde)
-            .toList();
+            .map(LugarResponse::desde);
     }
 
     // Consultar el detalle de un lugar activo.

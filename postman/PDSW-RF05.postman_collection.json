@@ -120,7 +120,7 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/api/v1/lugares"
+        "url": "{{baseUrl}}/api/v1/lugares?tamano=100"
       },
       "event": [
         {
@@ -129,7 +129,8 @@
             "exec": [
               "pm.test('200 OK', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('incluye el lugar creado', () => pm.expect(b.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));"
+              "pm.test('incluye el lugar creado', () => pm.expect(b.content.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));",
+              "pm.test('pagina con total', () => pm.expect(b.totalElements).to.be.at.least(1));"
             ]
           }
         }
@@ -160,7 +161,7 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/api/v1/lugares?categoria=Ecol%C3%B3gico"
+        "url": "{{baseUrl}}/api/v1/lugares?categoria=Ecol%C3%B3gico&tamano=100"
       },
       "event": [
         {
@@ -169,8 +170,8 @@
             "exec": [
               "pm.test('200 OK', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('devuelve solo ecológicos', () => pm.expect(b.every(l => l.categoria.toLowerCase() === 'ecológico')).to.be.true);",
-              "pm.test('incluye el lugar creado', () => pm.expect(b.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));"
+              "pm.test('devuelve solo ecológicos', () => pm.expect(b.content.every(l => l.categoria.toLowerCase() === 'ecológico')).to.be.true);",
+              "pm.test('incluye el lugar creado', () => pm.expect(b.content.map(l => l.id)).to.include(pm.collectionVariables.get('idLugar')));"
             ]
           }
         }
@@ -181,7 +182,7 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/api/v1/lugares?municipio=Salento"
+        "url": "{{baseUrl}}/api/v1/lugares?municipio=Salento&tamano=100"
       },
       "event": [
         {
@@ -190,11 +191,34 @@
             "exec": [
               "pm.test('200 OK', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('todos de Salento', () => pm.expect(b.every(l => l.municipio === 'Salento')).to.be.true);"
+              "pm.test('todos de Salento', () => pm.expect(b.content.every(l => l.municipio === 'Salento')).to.be.true);"
             ]
           }
         }
       ]
+    },
+    {
+      "name": "06b · Filtrar por interés y paginar (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('una sola parada por página', () => pm.expect(b.content.length).to.be.at.most(1));",
+              "pm.test('hay resultados ecológicos', () => pm.expect(b.totalElements).to.be.at.least(1));",
+              "pm.test('totalPages coherente', () => pm.expect(b.totalPages).to.be.at.least(1));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/lugares?interes=Ecol%C3%B3gico&pagina=0&tamano=1"
+      }
     },
     {
       "name": "07 · CA-06 Editar lugar (200)",

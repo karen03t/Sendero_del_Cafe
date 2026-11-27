@@ -47,7 +47,7 @@ Respuesta 200:
 - Distancia: haversine entre paradas.
 - Velocidad de caminata: 4.5 km/h. Visita por parada: 30 min.
 - Se agregan paradas mientras quepan en `tiempoDisponibleMin`; máximo 12.
-- Orden: vecino más cercano desde el origen y mejora 2-opt. Se usa esta heurística y no Dijkstra porque no hay red vial modelada; Dijkstra sobre un grafo completo de lugares devolvería la misma distancia directa.
+- Orden: Dijkstra sobre un grafo disperso de lugares (cada lugar conectado con sus 4 vecinos más cercanos) y mejora 2-opt. Al no haber red vial modelada, las aristas son distancias Haversine: con un grafo completo Dijkstra daría la línea recta, por eso el grafo es disperso y el camino entre paradas puede pasar por otros lugares.
 - Si no hay lugares que cumplan: 404 `SIN_LUGARES`.
 - Si el tiempo no alcanza ni para una parada: 400 `TIEMPO_INSUFICIENTE`.
 

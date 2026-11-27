@@ -74,6 +74,11 @@ Flyway crea el esquema y el catálogo de intereses en el primer arranque; no hay
 ### `GET /api/v1/intereses`
 Catálogo activo: `[{"id":1,"nombre":"ecológico"}, …]`
 
+### `GET /api/v1/lugares`
+Listado **paginado** de lugares activos (RF-02). Parámetros opcionales: `nombre`, `categoria`,
+`municipio`, `interes`, `pagina` (0) y `tamano` (20, máximo 100). Devuelve
+`{content: […], totalElements, totalPages, number, size}`.
+
 ## Cobertura geográfica
 
 El proyecto cubre únicamente el **Eje Cafetero**: Quindío, Risaralda y Caldas (53 municipios).
