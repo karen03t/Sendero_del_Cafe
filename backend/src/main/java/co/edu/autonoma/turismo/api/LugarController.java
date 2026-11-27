@@ -7,6 +7,7 @@ import co.edu.autonoma.turismo.api.dto.lugar.LugarResponse;
 import co.edu.autonoma.turismo.service.lugar.LugarService;
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,16 +34,23 @@ public class LugarController {
     // =====================================================
 
     // Consultar y filtrar exclusivamente lugares activos.
+    // SCRUM-25: interes del turista + paginacion (pagina 0, tamano 20 por defecto).
     @GetMapping
-    public List<LugarResponse> listar(
+    public Page<LugarResponse> listar(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) String municipio) {
+            @RequestParam(required = false) String municipio,
+            @RequestParam(required = false) String interes,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamano) {
 
         return lugarService.buscarActivos(
             nombre,
             categoria,
-            municipio
+            municipio,
+            interes,
+            pagina,
+            tamano
         );
     }
 
