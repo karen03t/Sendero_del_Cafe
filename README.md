@@ -81,6 +81,14 @@ El proyecto cubre únicamente el **Eje Cafetero**: Quindío, Risaralda y Caldas 
 con `400 MUNICIPIO_FUERA_COBERTURA`, y el nombre se guarda en su forma canónica
 (`salento` → `Salento`).
 
+## Seguridad
+
+- JWT HS512 con roles `TURISTA` y `OPERADOR`; el registro público de operadores está bloqueado.
+- Límite de intentos: 30 por minuto por IP y ruta en login y registro (`SEGURIDAD_RATE_LIMIT_MAXIMO`,
+  `SEGURIDAD_RATE_LIMIT_VENTANA_SEGUNDOS`). Al superarlo responde `429 DEMASIADAS_SOLICITUDES`.
+- CORS restringido a los orígenes de `SEGURIDAD_CORS_ORIGENES` (por defecto `localhost:5173` y `localhost:3000`).
+- Cabeceras `X-Frame-Options: DENY` y `X-Content-Type-Options: nosniff`.
+
 ## Probar con Postman
 
 Importar `postman/PDSW-RF01.postman_collection.json` y `postman/PDSW-Local.postman_environment.json`,
