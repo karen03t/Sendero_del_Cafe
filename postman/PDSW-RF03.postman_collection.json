@@ -1,0 +1,836 @@
+{
+  "info": {
+    "name": "PDSW · RF-03 Rutas",
+    "description": "RF-03 generar/personalizar/guardar rutas, RF-06 inactivar/recuperar y RF-04 sincronizacion.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8080"
+    },
+    {
+      "key": "operadorCorreo",
+      "value": "operador@sendero.co"
+    },
+    {
+      "key": "operadorPassword",
+      "value": "Operador2026*Segura"
+    },
+    {
+      "key": "tokenOperador",
+      "value": ""
+    },
+    {
+      "key": "tokenTurista",
+      "value": ""
+    },
+    {
+      "key": "correo",
+      "value": ""
+    },
+    {
+      "key": "rutaId",
+      "value": ""
+    },
+    {
+      "key": "paradas",
+      "value": "[]"
+    },
+    {
+      "key": "desde",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · Login operador",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "Credenciales de demostracion: operadorCorreo/operadorPassword en variables de coleccion.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{operadorCorreo}}\",\n  \"password\": \"{{operadorPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 y token de operador', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.rol).to.eql('OPERADOR');",
+              "  pm.collectionVariables.set('tokenOperador', b.token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 · Crear lugar A",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/lugares",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "lugares"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Calle Real {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"local\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.637,\n  \"longitud\": -75.571\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 y guarda el id', () => {",
+              "  pm.response.to.have.status(201);",
+              "  pm.collectionVariables.set('lugarA', pm.response.json().id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 · Crear lugar B",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/lugares",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "lugares"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Mirador {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"ecológico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.639,\n  \"longitud\": -75.569\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 y guarda el id', () => {",
+              "  pm.response.to.have.status(201);",
+              "  pm.collectionVariables.set('lugarB', pm.response.json().id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · Crear lugar C",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/lugares",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "lugares"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Finca {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"gastronómico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.641,\n  \"longitud\": -75.574\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 y guarda el id', () => {",
+              "  pm.response.to.have.status(201);",
+              "  pm.collectionVariables.set('lugarC', pm.response.json().id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · Registro turista",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/registro",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Turista RF-03\",\n  \"correo\": \"{{correo}}\",\n  \"password\": \"Turista2026*Segura\",\n  \"intereses\": [\n    1\n  ],\n  \"aceptaTratamientoDatos\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('correo', 'rutas' + Date.now() + '@demo.co');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 o 409 si ya existia', () => pm.expect([201,409]).to.include(pm.response.code));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 · Login turista",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"password\": \"Turista2026*Segura\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 y token de turista', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.rol).to.eql('TURISTA');",
+              "  pm.collectionVariables.set('tokenTurista', b.token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Propuesta de ruta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/propuesta",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "propuesta"
+          ]
+        },
+        "description": "RF-03: genera la propuesta con intereses y tiempo disponible.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"municipio\": \"Salento\",\n  \"intereses\": [\n    \"local\",\n    \"ecológico\",\n    \"gastronómico\"\n  ],\n  \"tiempoDisponibleMin\": 300\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 con paradas dentro del tiempo', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.paradas.length).to.be.above(0);",
+              "  pm.expect(b.duracionMin).to.be.at.most(300);",
+              "  pm.expect(b.paradas[0].orden).to.eql(1);",
+              "  pm.collectionVariables.set('paradas', JSON.stringify(b.paradas.map(p => p.lugarId)));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 · Guardar ruta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombre\": \"Ruta RF-03 {{$timestamp}}\", \"paradas\": {{paradas}}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 ACTIVA con paradas', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.estado).to.eql('ACTIVA');",
+              "  pm.expect(b.paradas.length).to.be.above(0);",
+              "  pm.collectionVariables.set('rutaId', b.id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 · Listar mis rutas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 y contiene la ruta creada', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().map(r => r.id);",
+              "  pm.expect(ids).to.include(pm.collectionVariables.get('rutaId'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 · Editar: reordenar y quitar",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/{{rutaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "{{rutaId}}"
+          ]
+        },
+        "description": "RF-03: anadir, quitar y reordenar paradas.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Ruta editada\",\n  \"paradas\": [\n    \"{{lugarC}}\",\n    \"{{lugarA}}\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 con el nuevo orden', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.nombre).to.eql('Ruta editada');",
+              "  pm.expect(b.paradas.map(p => p.lugarId)).to.eql([",
+              "    pm.collectionVariables.get('lugarC'),",
+              "    pm.collectionVariables.get('lugarA')",
+              "  ]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 · Inactivar ruta",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/{{rutaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "{{rutaId}}"
+          ]
+        },
+        "description": "RF-06 / CA-03: eliminar la marca inactiva, no la borra."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 RUTA_INACTIVADA', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().codigo).to.eql('RUTA_INACTIVADA');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 · Ya no aparece en activas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('no contiene la ruta inactivada', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().map(r => r.id);",
+              "  pm.expect(ids).to.not.include(pm.collectionVariables.get('rutaId'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · Aparece en inactivas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/inactivas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "inactivas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('contiene la ruta inactivada', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().map(r => r.id);",
+              "  pm.expect(ids).to.include(pm.collectionVariables.get('rutaId'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 · Recuperar ruta",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/{{rutaId}}/reactivar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "{{rutaId}}",
+            "reactivar"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 y vuelve a ACTIVA', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().estado).to.eql('ACTIVA');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 · Sincronizar cambios",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTurista}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas/sincronizar?desde={{desde}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas",
+            "sincronizar?desde={{desde}}"
+          ]
+        },
+        "description": "RF-04: hora local del servidor (MySQL DATETIME sin zona)."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = new Date(Date.now() - 10 * 60 * 1000);",
+              "const p = n => String(n).padStart(2, '0');",
+              "pm.collectionVariables.set('desde', d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 y devuelve la ruta en el delta', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const b = pm.response.json();",
+              "  const ids = b.rutas.map(r => r.id);",
+              "  pm.expect(ids).to.include(pm.collectionVariables.get('rutaId'));",
+              "  pm.expect(b).to.have.property('eliminadas');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 · Operador no puede ver rutas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOperador}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 para OPERADOR', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 · Sin token no hay acceso",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rutas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rutas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 o 403 sin token', () => pm.expect([401,403]).to.include(pm.response.code));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

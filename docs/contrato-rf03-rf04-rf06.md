@@ -85,6 +85,8 @@ GET /api/v1/rutas/sincronizar?desde=2026-11-10T08:00:00
 
 `ruta_guardada.fecha_actualizacion` (V6, `ON UPDATE CURRENT_TIMESTAMP`) es la marca que hace posible el delta. Sin ella habría que reenviar todo el perfil en cada sincronización.
 
+**Zona horaria:** las columnas son `DATETIME` sin zona, así que `desde` se interpreta en la hora local del servidor (America/Bogota). El cliente debe enviar ese formato, no UTC, o el delta saldrá vacío. Si el proyecto se despliega en varias zonas, habría que migrar estas columnas a `TIMESTAMP`/UTC.
+
 ## Códigos de error
 
 | Código | HTTP | Cuándo |
