@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,6 +116,46 @@ class LugarFlowTest {
 
         // Auditoria: tres acciones (la mas reciente primero)
         assertThat(auditoria(id)).containsExactly("INACTIVAR", "EDITAR", "CREAR");
+    }
+
+    @Test
+    void rechazaMunicipiosFueraDelEjeCafetero() {
+
+        Map<String, Object> bogota = new HashMap<>(lugar("Lugar en Bogotá"));
+        bogota.put("municipio", "Bogotá");
+
+        ResponseEntity<Map<String, Object>> intento = intercambiar(
+                "/api/v1/lugares", HttpMethod.POST, bogota, tokenOperador);
+
+        assertThat(intento.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(intento.getBody().get("codigo")).isEqualTo("MUNICIPIO_FUERA_COBERTURA");
+
+        // Actualizar hacia un municipio fuera de cobertura tampoco se permite.
+        Map<String, Object> crear = new HashMap<>(lugar("Mirador"));
+        String id = (String) intercambiar("/api/v1/lugares", HttpMethod.POST, crear, tokenOperador)
+                .getBody().get("id");
+
+        Map<String, Object> medellin = new HashMap<>(lugar("Mirador"));
+        medellin.put("municipio", "Medellín");
+
+        ResponseEntity<Map<String, Object>> edicion = intercambiar(
+                "/api/v1/lugares/" + id, HttpMethod.PUT, medellin, tokenOperador);
+
+        assertThat(edicion.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(edicion.getBody().get("codigo")).isEqualTo("MUNICIPIO_FUERA_COBERTURA");
+    }
+
+    @Test
+    void normalizaElNombreDelMunicipio() {
+
+        Map<String, Object> sinTildes = new HashMap<>(lugar("Finca cafetera"));
+        sinTildes.put("municipio", "salento");
+
+        ResponseEntity<Map<String, Object>> creado = intercambiar(
+                "/api/v1/lugares", HttpMethod.POST, sinTildes, tokenOperador);
+
+        assertThat(creado.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(creado.getBody().get("municipio")).isEqualTo("Salento");
     }
 
     @Test

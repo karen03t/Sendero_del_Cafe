@@ -121,7 +121,7 @@
         "description": "",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nombre\": \"Calle Real {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"local\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.637,\n  \"longitud\": -75.571\n}",
+          "raw": "{\n  \"nombre\": \"Calle Real {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"Local\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.637,\n  \"longitud\": -75.571\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -172,7 +172,7 @@
         "description": "",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nombre\": \"Mirador {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"ecológico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.639,\n  \"longitud\": -75.569\n}",
+          "raw": "{\n  \"nombre\": \"Mirador {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"Ecológico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.639,\n  \"longitud\": -75.569\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -223,7 +223,7 @@
         "description": "",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nombre\": \"Finca {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"gastronómico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.641,\n  \"longitud\": -75.574\n}",
+          "raw": "{\n  \"nombre\": \"Finca {{$timestamp}}\",\n  \"descripcion\": \"Lugar sembrado por la coleccion RF-03\",\n  \"categoria\": \"Gastronómico\",\n  \"direccion\": \"Via principal\",\n  \"municipio\": \"Salento\",\n  \"latitud\": 4.641,\n  \"longitud\": -75.574\n}",
           "options": {
             "raw": {
               "language": "json"

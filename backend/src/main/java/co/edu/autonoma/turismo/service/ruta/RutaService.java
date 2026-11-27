@@ -1,6 +1,7 @@
 package co.edu.autonoma.turismo.service.ruta;
 
 import co.edu.autonoma.turismo.api.dto.ruta.RutaDtos.*;
+import co.edu.autonoma.turismo.domain.CoberturaEjeCafetero;
 import co.edu.autonoma.turismo.domain.Lugar;
 import co.edu.autonoma.turismo.domain.Ruta;
 import co.edu.autonoma.turismo.domain.RutaGuardada;
@@ -62,7 +63,11 @@ public class RutaService {
     @Transactional(readOnly = true)
     public PropuestaResponse proponer(PropuestaRequest req) {
 
-        String municipio = req.municipio().trim();
+        String municipio = CoberturaEjeCafetero.canonico(req.municipio().trim())
+                .orElseThrow(() -> new ApiException(
+                        HttpStatus.BAD_REQUEST,
+                        "MUNICIPIO_FUERA_COBERTURA",
+                        "El municipio debe pertenecer al Eje Cafetero (Quindío, Risaralda o Caldas)"));
 
         List<Lugar> candidatos = filtrarPorIntereses(
                 lugares.buscarActivos(null, null, municipio),

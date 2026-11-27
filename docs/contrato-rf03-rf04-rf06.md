@@ -95,4 +95,5 @@ GET /api/v1/rutas/sincronizar?desde=2026-11-10T08:00:00
 | `TIEMPO_INSUFICIENTE` | 400 | El tiempo no alcanza para una parada |
 | `RUTA_NO_ENCONTRADA` | 404 | La ruta no existe o no es del turista |
 | `LUGAR_INACTIVO` | 409 | Se intenta guardar un lugar inactivo |
+| `MUNICIPIO_FUERA_COBERTURA` | 400 | El municipio no pertenece al Eje Cafetero |
 | `SIN_PERMISO` | 403 | Otro turista u otro rol |

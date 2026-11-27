@@ -6,6 +6,7 @@ import co.edu.autonoma.turismo.api.dto.lugar.LugarRequest;
 import co.edu.autonoma.turismo.api.dto.lugar.LugarResponse;
 import co.edu.autonoma.turismo.domain.Lugar;
 import co.edu.autonoma.turismo.domain.AuditoriaLugar;
+import co.edu.autonoma.turismo.domain.CoberturaEjeCafetero;
 
 import co.edu.autonoma.turismo.exception.ApiException;
 
@@ -54,6 +55,7 @@ public class LugarService {
         validarOperador(operadorId);
 
         String id = UUID.randomUUID().toString();
+        String municipio = municipioCubierto(req.municipio());
 
         Lugar lugar = new Lugar(
             id,
@@ -61,7 +63,7 @@ public class LugarService {
             req.descripcion().trim(),
             req.categoria().trim(),
             req.direccion().trim(),
-            req.municipio().trim(),
+            municipio,
             req.latitud(),
             req.longitud(),
             operadorId
@@ -155,6 +157,8 @@ public class LugarService {
 
         Lugar lugar = buscarActivo(id);
 
+        String municipio = municipioCubierto(req.municipio());
+
         Map<String, Object> cambios = new LinkedHashMap<>();
 
         comparar(cambios, "nombre",
@@ -170,7 +174,7 @@ public class LugarService {
             lugar.getDireccion(), req.direccion().trim());
 
         comparar(cambios, "municipio",
-            lugar.getMunicipio(), req.municipio().trim());
+            lugar.getMunicipio(), municipio);
 
         comparar(cambios, "latitud",
             lugar.getLatitud(), req.latitud());
@@ -191,7 +195,7 @@ public class LugarService {
             req.descripcion().trim(),
             req.categoria().trim(),
             req.direccion().trim(),
-            req.municipio().trim(),
+            municipio,
             req.latitud(),
             req.longitud()
         );
@@ -263,9 +267,20 @@ public class LugarService {
             ));
     }
 
+    // El proyecto cubre unicamente el Eje Cafetero: normaliza el nombre y
+    // rechaza cualquier municipio fuera de Quindio, Risaralda o Caldas.
+    private String municipioCubierto(String municipio) {
+
+        return CoberturaEjeCafetero.canonico(municipio)
+            .orElseThrow(() -> new ApiException(
+                HttpStatus.BAD_REQUEST,
+                "MUNICIPIO_FUERA_COBERTURA",
+                "El municipio debe pertenecer al Eje Cafetero (Quindío, Risaralda o Caldas)"
+            ));
+    }
+
     // Validar la identificación del operador.
     private void validarOperador(String operadorId) {
-
         if (operadorId == null || operadorId.isBlank()) {
             throw new ApiException(
                 HttpStatus.UNAUTHORIZED,

@@ -206,6 +206,20 @@ class RutaFlowTest {
     }
 
     @Test
+    void rechazaPropuestaFueraDelEjeCafetero() {
+
+        ResponseEntity<Map<String, Object>> respuesta = intercambiar(
+                "/api/v1/rutas/propuesta",
+                HttpMethod.POST,
+                Map.of("municipio", "Medellín",
+                        "tiempoDisponibleMin", 120),
+                token);
+
+        assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(respuesta.getBody().get("codigo")).isEqualTo("MUNICIPIO_FUERA_COBERTURA");
+    }
+
+    @Test
     void operadorNoPuedeUsarRutasDeTurista() {
 
         ResponseEntity<Map<String, Object>> respuesta = cliente.get()
