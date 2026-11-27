@@ -40,6 +40,13 @@ public class Turista {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+    // V5 / Ley 1581: ciclo de vida de la cuenta.
+    @Column(name = "fecha_ultima_actividad")
+    private LocalDateTime fechaUltimaActividad;
+
+    @Column(name = "fecha_eliminacion")
+    private LocalDateTime fechaEliminacion;
+
     public enum Proveedor { LOCAL, GOOGLE, APPLE }
 
     public enum EstadoTurista { ACTIVO, INACTIVO }
@@ -69,4 +76,24 @@ public class Turista {
     public LocalDateTime getFechaConsentimiento() { return fechaConsentimiento; }
     public EstadoTurista getEstado() { return estado; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public LocalDateTime getFechaUltimaActividad() { return fechaUltimaActividad; }
+    public LocalDateTime getFechaEliminacion() { return fechaEliminacion; }
+
+    /** Marca actividad para que la cuenta no caiga en la purga por inactividad. */
+    public void registrarActividad() {
+        this.fechaUltimaActividad = LocalDateTime.now();
+    }
+
+    /**
+     * Ley 1581: conserva la fila por integridad referencial (rutas guardadas)
+     * pero elimina los datos personales y deshabilita el acceso.
+     */
+    public void anonimizar(LocalDateTime momento) {
+        this.nombreCompleto = "Cuenta eliminada";
+        this.correo = "eliminado+" + id + "@anonimo.local";
+        this.passwordHash = null;
+        this.proveedorId = null;
+        this.estado = EstadoTurista.INACTIVO;
+        this.fechaEliminacion = momento;
+    }
 }

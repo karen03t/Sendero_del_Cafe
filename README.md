@@ -79,6 +79,13 @@ Listado **paginado** de lugares activos (RF-02). Parámetros opcionales: `nombre
 `municipio`, `interes`, `pagina` (0) y `tamano` (20, máximo 100). Devuelve
 `{content: […], totalElements, totalPages, number, size}`.
 
+## Retención de datos (Ley 1581)
+
+Un job diario (03:00, configurable con `RETENCION_CRON`) anonimiza las cuentas de turista
+sin actividad durante 12 meses (`RETENCION_MESES`): conserva la fila para no romper las
+rutas guardadas y elimina nombre, correo, contraseña y proveedor. La fecha de última
+actividad se actualiza en cada login.
+
 ## Cobertura geográfica
 
 El proyecto cubre únicamente el **Eje Cafetero**: Quindío, Risaralda y Caldas (53 municipios).
