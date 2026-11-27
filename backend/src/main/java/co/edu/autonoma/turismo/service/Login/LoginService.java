@@ -106,6 +106,9 @@ public class LoginService {
                         return Optional.empty();
                 }
 
+                turista.registrarActividad();
+                turistas.save(turista);
+
                 String token = tokenService.generar(
                         turista.getId(),
                         turista.getCorreo(),
